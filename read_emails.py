@@ -1,9 +1,15 @@
 import re
 from base64 import urlsafe_b64decode
 
-from common import gmail_authenticate, search_messages
-from const import LABEL_ID, WORKSHEET_NAME, SPREAD_KEY, ME_ID, ID, INCOME_KEY, DATE_KEY
-from writing_spread import connect_to_spreadsheet, write_messages
+from const import ME_ID, ID, INCOME_KEY, DATE_KEY
+
+
+def search_messages(service, label):
+    result = service.users().messages().list(userId='me', labelIds=label).execute()
+    messages = []
+    if 'messages' in result:
+        messages.extend(result['messages'])
+    return messages
 
 
 def read_message(service, mail):
@@ -37,18 +43,3 @@ def process_message(body, income):
                 body)
     message_dict = m.groupdict()
     return message_dict
-
-
-if __name__ == "__main__":
-    service = gmail_authenticate()
-    google_spread_oauth = connect_to_spreadsheet()
-    sheet = google_spread_oauth.open_by_key(SPREAD_KEY).worksheet(WORKSHEET_NAME)
-
-    results = search_messages(service, LABEL_ID)
-    for msg in results:
-        try:
-            message = read_message(service, msg)
-            write_messages(sheet, message)
-            service.users().messages().modify(userId=ME_ID, id=msg[ID], body={'removeLabelIds': [LABEL_ID]}).execute()
-        except:
-            print("Unexpected error:", msg['id'])

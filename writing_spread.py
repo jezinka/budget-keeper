@@ -1,18 +1,13 @@
 from datetime import datetime
 
-import gspread
-
+import const
 from category import get_category
-from const import DATE_KEY, WHEN_KEY, INCOME_KEY, AMOUNT_KEY, WHO_KEY, TITLE_KEY
+from const import DATE_KEY, WHEN_KEY, INCOME_KEY, AMOUNT_KEY, WHO_KEY, TITLE_KEY, SPREAD_KEY
 
 
-def connect_to_spreadsheet():
-    # connect to google sheet
-    google_spread_oauth = gspread.oauth()
-    return google_spread_oauth
+def write_messages(spread_service, m):
+    sheet = spread_service.open_by_key(SPREAD_KEY).worksheet(get_worksheet_name(m))
 
-
-def write_messages(sheet, m):
     row_index = get_first_empty_row(sheet)
     sheet.update_cell(row_index, 1, get_date(m))
     title = m[TITLE_KEY]
@@ -23,10 +18,12 @@ def write_messages(sheet, m):
     sheet.update_cell(row_index, 7, get_category(get_who(m), title))
 
 
+def get_worksheet_name(m):
+    return const.months[8]
+
+
 def get_who(m):
-    if WHO_KEY in m and m[WHO_KEY] is not None:
-        return m[WHO_KEY]
-    return ''
+    return m[WHO_KEY] if WHO_KEY in m and m[WHO_KEY] is not None else ''
 
 
 def get_amount(m):
