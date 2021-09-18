@@ -20,3 +20,6 @@ months = ['styczeń', 'luty', 'marzec',
           'kwiecień', 'maj', 'czerwiec',
           'lipiec', 'sierpień', 'wrzesień',
           'październik', 'listopad', 'grudzień']
+
+SHORT_F = "%d-%m-%Y"
+LONG_F = "%a, %d %b %Y %H:%M:%S %z"

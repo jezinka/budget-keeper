@@ -1,7 +1,8 @@
 import re
 from base64 import urlsafe_b64decode
 
-from const import ME_ID, ID, INCOME_KEY, DATE_KEY
+from const import ME_ID, ID
+from message import Message
 
 
 def search_messages(service, label):
@@ -16,6 +17,11 @@ def read_message(service, mail):
     msg = service.users().messages().get(userId=ME_ID, id=mail[ID], format='full').execute()
 
     payload = msg['payload']
+
+    return process_message(payload)
+
+
+def process_message(payload):
     headers = payload.get("headers")
 
     income = 'Wpływ' in list(filter(lambda x: x.get("name").lower() == "subject", headers))[0].get("value")
@@ -24,13 +30,7 @@ def read_message(service, mail):
     body = urlsafe_b64decode(payload.get("body")['data']).decode("utf-8", "replace")
     body = re.sub(r'<.*>', '', body)
     body = re.sub(r'\s{2}', '', body)
-    msg_dict = process_message(body, income)
-    msg_dict[DATE_KEY] = receive_date
-    msg_dict[INCOME_KEY] = income
-    return msg_dict
 
-
-def process_message(body, income):
     if income:
         m = re.search(r"Tytuł:(?P<tytul>[\w].*)Nadawca:(?P<kto>[\w].*)Kwota:(?P<kwota>[\d ]*,[\d]{2}) PLN", body)
     else:
@@ -41,5 +41,7 @@ def process_message(body, income):
             m = re.search(
                 r"Ile:-?(?P<kwota>[\d ]*,[\d]{2}) PLNKiedy:(?P<kiedy>[\d]{2}-[\d]{2}-[\d]{4})Gdzie:(?P<tytul>[\w].*)Telefon",
                 body)
-    message_dict = m.groupdict()
-    return message_dict
+
+    message = Message(m.groupdict(), income)
+    message.set_receive_date(receive_date)
+    return message
