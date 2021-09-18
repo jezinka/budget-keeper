@@ -1,3 +1,4 @@
+import logging
 import re
 from base64 import urlsafe_b64decode
 
@@ -43,5 +44,6 @@ def process_message(payload):
                 body)
 
     message = Message(m.groupdict(), income)
+    logging.info(message.get_title())
     message.set_receive_date(receive_date)
     return message
