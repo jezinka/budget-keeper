@@ -46,3 +46,6 @@ class Message:
     def get_month(self):
         date = self.operation_date if self.operation_date is not None else self.receive_date
         return int(date.strftime('%m'))
+
+    def get_row(self):
+        return [self.get_date(), self.get_title(), self.get_who(), self.get_amount()]
