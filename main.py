@@ -1,9 +1,11 @@
 import logging
 
+from spread_write import write_messages
+
 from const import LABEL_ID, ME_ID, ID
 from read_emails import search_messages, read_message
 from services import get_gmail_service, get_gspread_service
-from writing_spread import write_messages
+from write_csv import write_to_csv
 
 if __name__ == "__main__":
     logging.basicConfig(filename='logs/bk.log', filemode='a', level=logging.INFO)
@@ -21,6 +23,8 @@ if __name__ == "__main__":
                 logging.debug(f'message {msg[ID]} read')
                 write_messages(spread_service, message)
                 logging.debug(f'message {msg[ID]} saved in sheet')
+                write_to_csv(message)
+                logging.debug(f'message {msg[ID]} saved in csv')
                 gmail_service.users().messages().modify(userId=ME_ID, id=msg[ID],
                                                         body={'removeLabelIds': [LABEL_ID]}).execute()
                 logging.debug(f'message {msg[ID]} label removed')

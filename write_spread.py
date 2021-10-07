@@ -1,8 +1,9 @@
 import csv
 import logging
 
-import const
 from category import get_category
+
+import const
 from const import SPREAD_KEY
 
 
