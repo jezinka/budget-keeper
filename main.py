@@ -1,11 +1,10 @@
 import logging
 
-from spread_write import write_messages
-
 from const import LABEL_ID, ME_ID, ID
 from read_emails import search_messages, read_message
 from services import get_gmail_service, get_gspread_service
 from write_csv import write_to_csv
+from write_spread import write_messages
 
 if __name__ == "__main__":
     logging.basicConfig(filename='logs/bk.log', filemode='a', level=logging.INFO)
