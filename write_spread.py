@@ -1,7 +1,4 @@
-import csv
 import logging
-
-from category import get_category
 
 import const
 from const import SPREAD_KEY
@@ -17,11 +14,6 @@ def write_messages(spread_service, m):
     sheet.update_cell(row_index, 2, m.get_title())
     sheet.update_cell(row_index, 3, m.get_who())
     sheet.update_cell(row_index, 4, m.get_amount())
-    sheet.update_cell(row_index, 7, get_category(m))
-
-    with open('/home/pi/Desktop/budzet/paźdź.csv', 'a', encoding='UTF8', newline='') as budzet_file:
-        pazdz_writer = csv.writer(budzet_file, delimiter=',')
-        pazdz_writer.writerow(m.get_row())
 
 
 def get_worksheet_name(m):
