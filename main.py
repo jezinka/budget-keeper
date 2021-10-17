@@ -7,7 +7,7 @@ from write_csv import write_to_csv
 from write_spread import write_messages
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='logs/bk.log', filemode='a', level=logging.INFO)
+    logging.basicConfig(filename='logs/bk.log', filemode='a', level=logging.DEBUG)
     gmail_service = get_gmail_service()
     spread_service = get_gspread_service()
 

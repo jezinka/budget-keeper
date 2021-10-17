@@ -1,30 +1,29 @@
-import os
-import pickle
-
-import googleapiclient.discovery
 import gspread
+import os
+import os.path
+import pickle
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 
-from const import SCOPES, CLIENT_SECRET_FILE, SERVICE_ACCOUNT_FILE
+from const import CLIENT_SECRET_FILE, SCOPES, SERVICE_ACCOUNT_FILE, HINT_EMAIL, AUTH_CREDENTIALS_DAT
 
 
 def get_gmail_service():
-    creds = None
+    if not os.path.exists(AUTH_CREDENTIALS_DAT):
+        flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
+        authorization_url, state = flow.authorization_url(access_type='offline', login_hint=HINT_EMAIL,
+                                                          include_granted_scopes='true')
+        credentials = flow.run_local_server()
+        with open(AUTH_CREDENTIALS_DAT, 'wb') as credentials_dat:
+            pickle.dump(credentials, credentials_dat)
+    else:
+        with open(AUTH_CREDENTIALS_DAT, 'rb') as credentials_dat:
+            credentials = pickle.load(credentials_dat)
+    if credentials.expired:
+        credentials.refresh(Request())
 
-    if os.path.exists("auth/token.pickle"):
-        with open("auth/token.pickle", "rb") as token:
-            creds = pickle.load(token)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
-            creds = flow.run_local_server(port=0)
-
-        with open("auth/token.pickle", "wb") as token:
-            pickle.dump(creds, token)
-    return googleapiclient.discovery.build('gmail', 'v1', credentials=creds)
+    return build('gmail', 'v1', credentials=credentials)
 
 
 def get_gspread_service():
