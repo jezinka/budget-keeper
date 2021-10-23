@@ -1,7 +1,8 @@
-import gspread
 import os
 import os.path
 import pickle
+
+import gspread
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
@@ -23,7 +24,7 @@ def get_gmail_service():
     if credentials.expired:
         credentials.refresh(Request())
 
-    return build('gmail', 'v1', credentials=credentials)
+    return build('gmail', 'v1', credentials=credentials, cache_discovery=False)
 
 
 def get_gspread_service():
