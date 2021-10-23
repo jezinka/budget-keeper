@@ -7,7 +7,8 @@ from write_csv import write_to_csv
 from write_spread import write_messages
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='logs/bk.log', filemode='a', level=logging.DEBUG)
+    logging.basicConfig(filename='logs/bk.log', filemode='a', datefmt='%Y-%m-%d %H:%M:%S',
+                        format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG)
     gmail_service = get_gmail_service()
     spread_service = get_gspread_service()
 
