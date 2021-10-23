@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     results = search_messages(gmail_service, LABEL_ID)
 
-    logging.info(f'found {len(results)} mails for processing\n')
+    logging.info(f'found {len(results)} mails for processing')
     if len(results) > 0:
         for msg in results:
             logging.info(f'message {msg[ID]} processing start')
@@ -31,4 +31,4 @@ if __name__ == "__main__":
 
             except:
                 logging.error("Unexpected error: {msg['id']")
-            logging.info(f'message {msg[ID]} processing end\n')
+            logging.info(f'message {msg[ID]} processing end')
