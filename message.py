@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from const import AMOUNT_KEY, TITLE_KEY, WHO_KEY, WHEN_KEY, SHORT_F, LONG_F
@@ -10,6 +11,8 @@ class Message:
     operation_date = None  # when
 
     receive_date = None  # date
+    tokens = None
+    category = None
 
     def __init__(self, mail_dict, income):
         self.title = mail_dict[TITLE_KEY]
@@ -30,6 +33,12 @@ class Message:
     def set_receive_date(self, receive_date):
         self.receive_date = datetime.strptime(receive_date, LONG_F)
 
+    def set_tokens(self, tokens):
+        self.tokens = tokens
+
+    def set_category(self, category):
+        self.category = category
+
     def get_date(self):
         date = self.operation_date if self.operation_date is not None else self.receive_date
         return date.strftime(SHORT_F)
@@ -41,11 +50,22 @@ class Message:
         return self.who
 
     def get_amount(self):
-        return self.amount
+        string_amount = "{:.2f}".format(self.amount)
+        return re.sub(r'\.', ',', string_amount)
 
     def get_month(self):
         date = self.operation_date if self.operation_date is not None else self.receive_date
         return int(date.strftime('%m'))
 
+    def get_tokens(self):
+        return self.tokens
+
+    def get_category(self):
+        return self.category
+
     def get_row(self):
-        return [self.get_date(), self.get_title(), self.get_who(), self.get_amount()]
+        return [self.get_date(), self.get_title(), self.get_who(), self.get_amount(), self.get_tokens()]
+
+    def get_row_with_category(self):
+        return [self.get_date(), self.get_title(), self.get_who(), self.get_amount(), self.get_tokens(),
+                self.get_category()]

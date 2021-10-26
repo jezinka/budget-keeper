@@ -1,7 +1,6 @@
 import logging
 
-import const
-from const import SPREAD_KEY
+from const import SPREAD_KEY, months
 
 
 def write_messages(spread_service, m):
@@ -14,11 +13,12 @@ def write_messages(spread_service, m):
     sheet.update_cell(row_index, 2, m.get_title())
     sheet.update_cell(row_index, 3, m.get_who())
     sheet.update_cell(row_index, 4, m.get_amount())
+    sheet.update_cell(row_index, 7, m.get_category())
 
 
 def get_worksheet_name(m):
     month_no = m.get_month()
-    return const.months[month_no - 1]
+    return months[month_no - 1]
 
 
 def get_first_empty_row(sheet):
