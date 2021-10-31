@@ -8,15 +8,15 @@ AMOUNT_KEY = 'kwota'
 WHO_KEY = 'kto'
 TITLE_KEY = 'tytul'
 
-SERVICE_ACCOUNT_FILE = 'bank_auth/service-account.json'
+SERVICE_ACCOUNT_FILE = 'auth/bank_auth/service-account.json'
 
 BANK_SCOPES = ['https://mail.google.com/', 'https://www.googleapis.com/auth/spreadsheets']
-BANK_CLIENT_SECRET_FILE = 'bank_auth/client_secret.json'
-BANK_AUTH_CREDENTIALS_DAT = 'bank_auth/credentials.dat'
+BANK_CLIENT_SECRET_FILE = 'auth/bank_auth/client_secret.json'
+BANK_AUTH_CREDENTIALS_DAT = 'auth/bank_auth/credentials.dat'
 
 MESSAGE_SCOPES = ['https://mail.google.com/']
-MESSAGE_CLIENT_SECRET_FILE = 'message_auth/client_secret.json'
-MESSAGE_AUTH_CREDENTIALS_DAT = 'message_auth/credentials.dat'
+MESSAGE_CLIENT_SECRET_FILE = 'auth/message_auth/client_secret.json'
+MESSAGE_AUTH_CREDENTIALS_DAT = 'auth/message_auth/credentials.dat'
 
 LABEL_ID = 'Label_6824676119774138946'
 ME_ID = 'me'
