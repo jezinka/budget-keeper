@@ -1,4 +1,4 @@
-import logging
+import budget_logging
 
 from const import SPREAD_KEY, months
 
@@ -7,7 +7,7 @@ def write_messages(spread_service, m):
     sheet = spread_service.open_by_key(SPREAD_KEY).worksheet(get_worksheet_name(m))
     row_index = get_first_empty_row(sheet)
 
-    logging.debug(f'Writing message {m.get_title()} into row {row_index}')
+    budget_logging.debug(f'Writing message {m.get_title()} into row {row_index}')
 
     sheet.update_cell(row_index, 1, m.get_date())
     sheet.update_cell(row_index, 2, m.get_title())

@@ -1,8 +1,8 @@
-import logging
 import re
 from base64 import urlsafe_b64decode
 from datetime import datetime, timedelta
 
+import budget_logging
 from const import ME_ID, ID
 from message import Message
 
@@ -22,11 +22,12 @@ def parse_message(payload):
         message_body = re.sub(r'\s{2}', '', message_body)
     else:
         if payload.get("parts"):
-            desired_mime_types = ['multipart/alternative', 'multipart/related', 'text/plain', 'text/html']
+            desired_mime_types = ['multipart/alternative', 'multipart/mixed', 'multipart/related', 'text/plain',
+                                  'text/html']
             parts = list(filter(
                 lambda x: x.get('mimeType') in desired_mime_types, payload['parts']))
             if len(parts) == 0:
-                logging.error(';'.join([d['mimeType'] for d in payload['parts']]))
+                budget_logging.error(';'.join([d['mimeType'] for d in payload['parts']]))
             for part in parts:
                 return parse_message(part)
     return message_body
@@ -41,13 +42,13 @@ def search_mails(service, query):
     if 'messages' in result:
         messages.extend(result['messages'])
 
-    body = ''
+    mails_body = []
     for msg in messages:
         mail = service.users().messages().get(userId=ME_ID, id=msg[ID], format='full').execute()
         payload = mail['payload']
-        body += parse_message(payload)
+        mails_body.append(parse_message(payload))
 
-    return body
+    return '\n'.join(mails_body)
 
 
 def read_message(service, mail):
@@ -84,7 +85,7 @@ def process_message(payload):
                 body)
 
     message = Message(m.groupdict(), income)
-    logging.info(message.get_title())
+    budget_logging.info(message.get_title())
     message.set_receive_date(receive_date)
     return message
 
@@ -92,15 +93,18 @@ def process_message(payload):
 def finding_corresponding_mails(gmail_message_service, message, msg_id):
     date = message.get_date()
     amount = re.sub(r'-', '', message.get_amount())
-    body = get_mails(amount, date, gmail_message_service, msg_id)
-    if len(body) == 0:
+    corresponding_body = get_mails(amount, date, gmail_message_service, msg_id)
+    if len(corresponding_body) == 0:
         amount = re.sub(r',', '.', amount)
-        body = get_mails(amount, date, gmail_message_service, msg_id)
-    return body
+        corresponding_body = get_mails(amount, date, gmail_message_service, msg_id)
+    if len(corresponding_body) == 0 and len(amount) > 6:
+        amount = amount[:-6] + '.' + amount[-6:]
+        corresponding_body = get_mails(amount, date, gmail_message_service, msg_id)
+    return corresponding_body
 
 
 def get_mails(amount, date, gmail_message_service, msg_id):
     body = search_mails(gmail_message_service, get_mail_query(date, amount))
     result = "found something" if len(body) > 0 else "nothing"
-    logging.debug(f'message {msg_id} searching for corresponding mails - {result}')
+    budget_logging.debug(f'message {msg_id} searching for corresponding mails - {result}')
     return body
