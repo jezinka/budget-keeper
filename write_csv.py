@@ -1,9 +1,12 @@
 import csv
 import os
+from pathlib import Path
+
+from const import INPUT_CSV
 
 
 def write_to_input(m):
-    with open('data/input.csv', 'w', encoding='UTF8', newline='') as budget_file:
+    with open(INPUT_CSV, 'w', encoding='UTF8', newline='') as budget_file:
         input_writer = csv.writer(budget_file, delimiter=',')
         input_writer.writerow(['KIEDY', 'CO', 'KTO', 'ILE', 'MAILE'])
         input_writer.writerow(m.get_row())
@@ -16,4 +19,6 @@ def write_to_history(m):
 
 
 def delete_file():
-    os.remove('data/input.csv')
+    input_file = Path(INPUT_CSV)
+    if input_file.is_file():
+        os.remove(INPUT_CSV)

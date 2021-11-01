@@ -29,3 +29,5 @@ months = ['styczeń', 'luty', 'marzec',
 
 SHORT_F = "%d-%m-%Y"
 LONG_F = "%a, %d %b %Y %H:%M:%S %z"
+
+INPUT_CSV = 'data/input.csv'

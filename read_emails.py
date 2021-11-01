@@ -95,8 +95,14 @@ def finding_corresponding_mails(gmail_message_service, message, msg_id):
     amount = re.sub(r'-', '', message.get_amount())
     corresponding_body = get_mails(amount, date, gmail_message_service, msg_id)
     if len(corresponding_body) == 0:
+        amount_zl = amount + 'zł'
+        corresponding_body = get_mails(amount_zl, date, gmail_message_service, msg_id)
+    if len(corresponding_body) == 0:
         amount = re.sub(r',', '.', amount)
         corresponding_body = get_mails(amount, date, gmail_message_service, msg_id)
+    if len(corresponding_body) == 0:
+        amount_zl = amount + 'zł'
+        corresponding_body = get_mails(amount_zl, date, gmail_message_service, msg_id)
     if len(corresponding_body) == 0 and len(amount) > 6:
         amount = amount[:-6] + '.' + amount[-6:]
         corresponding_body = get_mails(amount, date, gmail_message_service, msg_id)
