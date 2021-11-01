@@ -1,8 +1,8 @@
+import logging
 import re
 from base64 import urlsafe_b64decode
 from datetime import datetime, timedelta
 
-import budget_logging
 from const import ME_ID, ID
 from message import Message
 
@@ -27,7 +27,7 @@ def parse_message(payload):
             parts = list(filter(
                 lambda x: x.get('mimeType') in desired_mime_types, payload['parts']))
             if len(parts) == 0:
-                budget_logging.error(';'.join([d['mimeType'] for d in payload['parts']]))
+                logging.error(';'.join([d['mimeType'] for d in payload['parts']]))
             for part in parts:
                 return parse_message(part)
     return message_body
@@ -85,7 +85,7 @@ def process_message(payload):
                 body)
 
     message = Message(m.groupdict(), income)
-    budget_logging.info(message.get_title())
+    logging.info(message.get_title())
     message.set_receive_date(receive_date)
     return message
 
@@ -106,5 +106,5 @@ def finding_corresponding_mails(gmail_message_service, message, msg_id):
 def get_mails(amount, date, gmail_message_service, msg_id):
     body = search_mails(gmail_message_service, get_mail_query(date, amount))
     result = "found something" if len(body) > 0 else "nothing"
-    budget_logging.debug(f'message {msg_id} searching for corresponding mails - {result}')
+    logging.debug(f'message {msg_id} searching for corresponding mails - {result}')
     return body
