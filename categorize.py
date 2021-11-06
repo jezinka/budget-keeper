@@ -4,6 +4,7 @@ import shutil
 from ludwig.api import LudwigModel
 
 from budget_logging import logging_config
+from const import HISTORY_CSV
 
 
 def predict():
@@ -26,7 +27,7 @@ def learn():
         ]
     }
     ludwig_model = LudwigModel(config)
-    train_stats, _, _ = ludwig_model.train(dataset='data/history.csv')
+    train_stats, _, _ = ludwig_model.train(dataset=HISTORY_CSV)
     ludwig_model.save('ludwig/model')
     shutil.rmtree('results/')
 

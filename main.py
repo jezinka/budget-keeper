@@ -44,8 +44,10 @@ if __name__ == "__main__":
                 write_messages(spread_service, message)
                 logging.debug(f'message {msg[ID]} saved in sheet')
 
-                gmail_service.users().messages().modify(userId=ME_ID, id=msg[ID],
-                                                        body={'removeLabelIds': [LABEL_ID]}).execute()
+                gmail_service.users().messages().modify(userId=ME_ID,
+                                                        id=msg[ID],
+                                                        body={'removeLabelIds': [LABEL_ID]}
+                                                        ).execute()
                 logging.debug(f'message {msg[ID]} label removed')
 
             except Exception as err:

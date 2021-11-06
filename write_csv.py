@@ -2,7 +2,7 @@ import csv
 import os
 from pathlib import Path
 
-from const import INPUT_CSV
+from const import INPUT_CSV, HISTORY_CSV
 
 
 def write_to_input(m):
@@ -13,7 +13,7 @@ def write_to_input(m):
 
 
 def write_to_history(m):
-    with open('data/history.csv', 'a', encoding='UTF8', newline='') as history_file:
+    with open(HISTORY_CSV, 'a', encoding='UTF8', newline='') as history_file:
         history_writer = csv.writer(history_file, delimiter=',')
         history_writer.writerow(m.get_row_with_category())
 
