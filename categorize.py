@@ -1,5 +1,4 @@
 import logging
-import shutil
 
 from ludwig.api import LudwigModel
 
@@ -8,7 +7,7 @@ from const import HISTORY_CSV
 
 
 def predict():
-    ludwig_model = LudwigModel.load('ludwig/model')
+    ludwig_model = LudwigModel.load('results/api_experiment_run_0/model')
     predictions, _ = ludwig_model.predict(dataset='data/input.csv')
 
     return predictions.values[0][0]
@@ -29,7 +28,7 @@ def learn():
     ludwig_model = LudwigModel(config)
     train_stats, _, _ = ludwig_model.train(dataset=HISTORY_CSV)
     ludwig_model.save('ludwig/model')
-    shutil.rmtree('results/')
+    # shutil.rmtree('results/')
 
 
 if __name__ == "__main__":
