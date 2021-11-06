@@ -7,7 +7,7 @@ from const import HISTORY_CSV
 
 
 def predict():
-    ludwig_model = LudwigModel.load('results/api_experiment_run_0/model')
+    ludwig_model = LudwigModel.load('results/api_experiment_run_1/model')
     predictions, _ = ludwig_model.predict(dataset='data/input.csv')
 
     return predictions.values[0][0]
