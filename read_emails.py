@@ -1,7 +1,6 @@
 import logging
 import re
 from base64 import urlsafe_b64decode
-from datetime import datetime, timedelta
 
 from const import ME_ID, ID
 from message import Message
@@ -56,13 +55,6 @@ def read_message(service, mail):
     return process_message(msg['payload'])
 
 
-def get_mail_query(date, amount):
-    date = datetime.strptime(date, "%d-%m-%Y")
-    day_before = f'after: {(date - timedelta(days=1)).strftime("%Y/%m/%d")}'
-    day_after = f'before: {(date + timedelta(days=1)).strftime("%Y/%m/%d")}'
-    return f'"{amount}" -"Poszerz swoje ostatnie zakupy" -"pożegnaliśmy Twoją paczuszkę" {day_before} {day_after}'
-
-
 def process_message(payload):
     headers = payload.get("headers")
 
@@ -88,29 +80,3 @@ def process_message(payload):
     logging.info(message.get_title())
     message.set_receive_date(receive_date)
     return message
-
-
-def finding_corresponding_mails(gmail_message_service, message, msg_id):
-    date = message.get_date()
-    amount = re.sub(r'-', '', message.get_amount())
-    corresponding_body = get_mails(amount, date, gmail_message_service, msg_id)
-    if len(corresponding_body) == 0:
-        amount_zl = amount + 'zł'
-        corresponding_body = get_mails(amount_zl, date, gmail_message_service, msg_id)
-    if len(corresponding_body) == 0:
-        amount = re.sub(r',', '.', amount)
-        corresponding_body = get_mails(amount, date, gmail_message_service, msg_id)
-    if len(corresponding_body) == 0:
-        amount_zl = amount + 'zł'
-        corresponding_body = get_mails(amount_zl, date, gmail_message_service, msg_id)
-    if len(corresponding_body) == 0 and len(amount) > 6:
-        amount = amount[:-6] + '.' + amount[-6:]
-        corresponding_body = get_mails(amount, date, gmail_message_service, msg_id)
-    return corresponding_body
-
-
-def get_mails(amount, date, gmail_message_service, msg_id):
-    body = search_mails(gmail_message_service, get_mail_query(date, amount))
-    result = "found something" if len(body) > 0 else "nothing"
-    logging.debug(f'message {msg_id} searching for corresponding mails - {result}')
-    return body

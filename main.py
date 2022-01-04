@@ -1,12 +1,9 @@
 import logging
 
-import categorize
-import clean_messages
 from budget_logging import logging_config
 from const import LABEL_ID, ME_ID, ID
-from read_emails import search_bank_messages, read_message, finding_corresponding_mails
-from services import get_gspread_service, get_bank_gmail_service, get_message_gmail_service
-from write_csv import write_to_input, write_to_history, delete_file
+from read_emails import search_bank_messages, read_message
+from services import get_gspread_service, get_bank_gmail_service
 from write_spread import write_messages
 
 if __name__ == "__main__":
@@ -24,23 +21,6 @@ if __name__ == "__main__":
                 message = read_message(gmail_service, msg)
                 logging.debug(f'message {msg[ID]} read')
 
-                gmail_message_service = get_message_gmail_service()
-                body = finding_corresponding_mails(gmail_message_service, message, msg[ID])
-
-                if len(body) > 0:
-                    message.tokens = ';'.join(clean_messages.process_body(body))
-                    logging.debug(f'message {msg[ID]} tokenized corresponding mails')
-
-                write_to_input(message)
-                logging.debug(f'message {msg[ID]} saved in input for ludwig')
-
-                category = categorize.predict()
-                logging.debug(f'message {msg[ID]} predicted category: {category}')
-                message.set_category(category)
-
-                write_to_history(message)
-                logging.debug(f'message {msg[ID]} saved in csv')
-
                 write_messages(spread_service, message)
                 logging.debug(f'message {msg[ID]} saved in sheet')
 
@@ -53,6 +33,3 @@ if __name__ == "__main__":
             except Exception as err:
                 logging.error(f"Unexpected error: {msg[ID]}: {err}")
                 logging.info(f'message {msg[ID]} processing end')
-            finally:
-                delete_file()
-                logging.debug('input file deleted')

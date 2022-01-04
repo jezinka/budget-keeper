@@ -7,8 +7,7 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-from const import BANK_CLIENT_SECRET_FILE, BANK_SCOPES, SERVICE_ACCOUNT_FILE, BANK_AUTH_CREDENTIALS_DAT, \
-    MESSAGE_AUTH_CREDENTIALS_DAT, MESSAGE_CLIENT_SECRET_FILE, MESSAGE_SCOPES
+from const import BANK_CLIENT_SECRET_FILE, BANK_SCOPES, SERVICE_ACCOUNT_FILE, BANK_AUTH_CREDENTIALS_DAT
 
 
 def __get_gmail_service(auth_credentials_dat, client_secret_file, scopes):
@@ -29,10 +28,6 @@ def __get_gmail_service(auth_credentials_dat, client_secret_file, scopes):
 
 def get_bank_gmail_service():
     return __get_gmail_service(BANK_AUTH_CREDENTIALS_DAT, BANK_CLIENT_SECRET_FILE, BANK_SCOPES)
-
-
-def get_message_gmail_service():
-    return __get_gmail_service(MESSAGE_AUTH_CREDENTIALS_DAT, MESSAGE_CLIENT_SECRET_FILE, MESSAGE_SCOPES)
 
 
 def get_gspread_service():
