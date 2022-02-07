@@ -73,7 +73,7 @@ def process_message(payload):
             body)
         if m is None:
             m = re.search(
-                r"Ile:-?(?P<kwota>[\d ]*,[\d]{2}) PLNKiedy:(?P<kiedy>[\d]{2}-[\d]{2}-[\d]{4})Gdzie:(?P<tytul>[\w].*)Telefon",
+                r"Ile:[-+]?(?P<kwota>[\d ]*,[\d]{2}) PLNKiedy:(?P<kiedy>[\d]{2}-[\d]{2}-[\d]{4})Gdzie:(?P<tytul>[\w].*)Telefon",
                 body)
 
     message = Message(m.groupdict(), income)
