@@ -86,7 +86,7 @@ def process_message(payload):
 def is_income(body, headers):
     income = 'Wpływ' in list(filter(lambda x: x.get("name").lower() == "subject", headers))[0].get("value")
     if not income:
-        income = re.search(r"Ile:\+?(?P<kwota>[\d ]*,[\d]{2})", body) is not None
+        income = re.search(r"Ile:\+(?P<kwota>[\d ]*,[\d]{2})", body) is not None
     return income
 
 
