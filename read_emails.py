@@ -70,11 +70,11 @@ def process_message(payload):
                 body)
     else:
         m = re.search(
-            r"(Odbiorca:(?P<kto>.*))?Ile:(?P<kwota>[\d ]*,[\d]{2}) PLNTytuł:(?P<tytul>[\w].*)Kiedy:(?P<kiedy>[\d]{2}-[\d]{2}-[\d]{4})",
+            r"(Odbiorca:(?P<kto>.*))?Ile:(?P<kwota>[\d ]*,[\d]{2}) PLNTytuł:(?P<tytul>.*)Kiedy:(?P<kiedy>[\d]{2}-[\d]{2}-[\d]{4})",
             body)
         if m is None:
             m = re.search(
-                r"Ile:-?(?P<kwota>[\d ]*,[\d]{2}) PLNKiedy:(?P<kiedy>[\d]{2}-[\d]{2}-[\d]{4})Gdzie:(?P<tytul>[\w].*)Telefon",
+                r"Ile:-?(?P<kwota>[\d ]*,[\d]{2}) PLNKiedy:(?P<kiedy>[\d]{2}-[\d]{2}-[\d]{4})Gdzie:(?P<tytul>.*)Telefon",
                 body)
 
     message = Message(m.groupdict(), income)
