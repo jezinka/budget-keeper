@@ -48,3 +48,19 @@ class Message:
     def get_month(self):
         date = self.operation_date if self.operation_date is not None else self.receive_date
         return int(date.strftime('%m'))
+
+    def get_category(self):
+        if self.title is None:
+            return ''
+
+        if 'końcówek' in self.title:
+            return 'końcówki'
+        if 'IKZE' in self.title:
+            return 'emerytura'
+        if 'Legimi' in self.title or 'Doładowanie telefonu' in self.title or 'spotify' in self.title.lower():
+            return 'abonament'
+        if 'Urbancard' in self.title:
+            return 'bilety'
+        if 'Finax' in self.who:
+            return 'inwestycje'
+        return ''
