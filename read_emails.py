@@ -66,7 +66,7 @@ def process_message(payload):
         m = re.search(r"Tytuł:(?P<tytul>[\w].*)Nadawca:(?P<kto>[\w].*)Kwota:(?P<kwota>[\d ]*,[\d]{2}) PLN", body)
         if m is None:
             m = re.search(
-                r"Ile:\+?(?P<kwota>[\d ]*,[\d]{2}) PLNKiedy:(?P<kiedy>[\d]{2}-[\d]{2}-[\d]{4})Gdzie:(?P<tytul>[\w].*)Telefon",
+                r"Ile:\+?(?P<kwota>[\d ]*,[\d]{2}) PLNKiedy:(?P<kiedy>[\d]{2}-[\d]{2}-[\d]{4})(Karta:(?P<karta>[\w].*))?Gdzie:(?P<tytul>[\w].*)Telefon",
                 body)
     else:
         m = re.search(
@@ -84,7 +84,8 @@ def process_message(payload):
 
 
 def is_income(body, headers):
-    income = 'Wpływ' in list(filter(lambda x: x.get("name").lower() == "subject", headers))[0].get("value")
+    title = list(filter(lambda x: x.get("name").lower() == "subject", headers))[0].get("value")
+    income = 'Wpływ' in title or 'Wpłata' in title
     if not income:
         income = re.search(r"Ile:\+(?P<kwota>[\d ]*,[\d]{2})", body) is not None
     return income
