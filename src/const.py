@@ -8,11 +8,11 @@ AMOUNT_KEY = 'kwota'
 WHO_KEY = 'kto'
 TITLE_KEY = 'tytul'
 
-SERVICE_ACCOUNT_FILE = '../auth/bank_auth/service-account.json'
+SERVICE_ACCOUNT_FILE = 'auth/bank_auth/service-account.json'
 
 BANK_SCOPES = ['https://mail.google.com/', 'https://www.googleapis.com/auth/spreadsheets']
-BANK_CLIENT_SECRET_FILE = '../auth/bank_auth/client_secret.json'
-BANK_AUTH_CREDENTIALS_DAT = '../auth/bank_auth/credentials.dat'
+BANK_CLIENT_SECRET_FILE = 'auth/bank_auth/client_secret.json'
+BANK_AUTH_CREDENTIALS_DAT = 'auth/bank_auth/credentials.dat'
 
 LABEL_ID = 'Label_6824676119774138946'
 ME_ID = 'me'
@@ -26,4 +26,4 @@ months = ['styczeń', 'luty', 'marzec',
 SHORT_F = "%d-%m-%Y"
 LONG_F = "%a, %d %b %Y %H:%M:%S %z"
 
-LOG_FILE = '../logs/bk.log'
+LOG_FILE = 'logs/bk.log'
