@@ -1,0 +1,16 @@
+version: "3"
+services:
+  app-db:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=myDB
+      - MYSQL_TCP_PORT=3307
+    ports:
+      - "3307:3307"
+    expose:
+      - 3307
+  app:
+    build: .
+    depends_on:
+      - app-db
