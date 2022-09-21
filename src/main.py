@@ -4,6 +4,7 @@ from budget_logging import logging_config
 from const import LABEL_ID, ME_ID, ID
 from read_emails import search_bank_messages, read_message
 from services import get_gspread_service, get_bank_gmail_service
+from src.db_utils import Db_utils
 from write_spread import write_messages
 
 if __name__ == "__main__":
@@ -15,6 +16,7 @@ if __name__ == "__main__":
 
     logging.info(f'found {len(results)} mails for processing')
     if len(results) > 0:
+        db_utils = Db_utils()
         for msg in results:
             logging.info(f'message {msg[ID]} processing start')
             try:
@@ -23,6 +25,9 @@ if __name__ == "__main__":
 
                 write_messages(spread_service, message)
                 logging.debug(f'message {msg[ID]} saved in sheet')
+
+                db_utils.insert_transaction(message)
+                logging.debug(f'message {msg[ID]} saved in db')
 
                 gmail_service.users().messages().modify(userId=ME_ID,
                                                         id=msg[ID],
@@ -33,3 +38,5 @@ if __name__ == "__main__":
             except Exception as err:
                 logging.error(f"Unexpected error: {msg[ID]}: {err}")
                 logging.info(f'message {msg[ID]} processing end')
+
+        db_utils.close_connection()

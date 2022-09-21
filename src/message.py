@@ -41,9 +41,12 @@ class Message:
     def get_who(self):
         return self.who
 
-    def get_amount(self):
-        string_amount = "{:.2f}".format(self.amount)
-        return re.sub(r'\.', ',', string_amount)
+    def get_amount(self, to_string=True):
+        if to_string is True:
+            string_amount = "{:.2f}".format(self.amount)
+            return re.sub(r'\.', ',', string_amount)
+        else:
+            return self.amount
 
     def get_month(self):
         date = self.operation_date if self.operation_date is not None else self.receive_date

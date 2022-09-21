@@ -27,3 +27,6 @@ SHORT_F = "%d-%m-%Y"
 LONG_F = "%a, %d %b %Y %H:%M:%S %z"
 
 LOG_FILE = 'logs/bk.log'
+
+DB_USER = "budget-keeper"
+DB_PASSWORD = "123Budget#"
