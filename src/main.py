@@ -2,9 +2,9 @@ import logging
 
 from budget_logging import logging_config
 from const import LABEL_ID, ME_ID, ID
+from db_utils import Db_utils
 from read_emails import search_bank_messages, read_message
 from services import get_gspread_service, get_bank_gmail_service
-from src.db_utils import Db_utils
 from write_spread import write_messages
 
 if __name__ == "__main__":
