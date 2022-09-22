@@ -11,7 +11,7 @@ class Db_utils:
     def __init__(self):
         time.sleep(10)
         self.connection = mariadb.connect(user=const.DB_USER, password=const.DB_PASSWORD,
-                                          host='maria_db',
+                                          host='localhost',
                                           port='3306',
                                           database='budget',
                                           charset='latin1')
