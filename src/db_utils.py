@@ -1,5 +1,5 @@
-import mysql.connector
-
+import mysql.connector as mariadb
+import time
 import const
 
 
@@ -7,10 +7,12 @@ class Db_utils:
     connection = None
 
     def __init__(self):
-        self.connection = mysql.connector.connect(user=const.DB_USER, password=const.DB_PASSWORD,
-                                                  host='127.0.0.1',
-                                                  port='3307',
-                                                  database='budget')
+        time.sleep(10)
+        self.connection = mariadb.connect(user='budget-keeper', password='123Budget#',
+                                                  host='maria_db',
+                                                  port='3306',
+                                                  database='budget',
+                                                  charset='latin1')
 
     def insert_transaction(self, message):
         cursor = self.connection.cursor()

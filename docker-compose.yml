@@ -1,23 +1,22 @@
-version: "3"
+version: "3.6"
 services:
   app-db:
     restart: always
-    image: mysql
+    container_name: maria_db
+    image: linuxserver/mariadb:alpine
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=budget
-      - MYSQL_TCP_PORT=3307
       - MYSQL_USER=budget-keeper
       - MYSQL_PASSWORD=123Budget#
     ports:
-      - "3307:3307"
+      - "3306:3306"
     expose:
-      - 3307
+      - 3306
     volumes:
       - "./scripts/schema.sql:/docker-entrypoint-initdb.d/schema.sql"
 
   app:
-    restart: always
     build: .
     depends_on:
       - app-db
