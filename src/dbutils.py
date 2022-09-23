@@ -12,7 +12,6 @@ class DbUtils:
         time.sleep(15)
         self.connection = mariadb.connect(user=const.DB_USER, password=const.DB_PASSWORD,
                                           host='maria_db',
-                                          port='3307',
                                           database='budget')
 
     def insert_transaction(self, message):
