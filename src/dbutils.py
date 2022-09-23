@@ -5,16 +5,15 @@ import mysql.connector as mariadb
 import const
 
 
-class Db_utils:
+class DbUtils:
     connection = None
 
     def __init__(self):
-        time.sleep(10)
+        time.sleep(15)
         self.connection = mariadb.connect(user=const.DB_USER, password=const.DB_PASSWORD,
-                                          host='localhost',
-                                          port='3306',
-                                          database='budget',
-                                          charset='latin1')
+                                          host='maria_db',
+                                          port='3307',
+                                          database='budget')
 
     def insert_transaction(self, message):
         cursor = self.connection.cursor()

@@ -10,13 +10,14 @@ services:
       - MYSQL_USER=budget-keeper
       - MYSQL_PASSWORD=123Budget#
     ports:
-      - "3306:3306"
+      - "3307:3307"
     expose:
-      - 3306
+      - 3307
     volumes:
       - "./scripts/schema.sql:/docker-entrypoint-initdb.d/schema.sql"
 
   app:
     build: .
+    restart: always
     depends_on:
       - app-db
