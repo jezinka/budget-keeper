@@ -13,13 +13,13 @@ def main():
     logging_config()
     gmail_service = get_bank_gmail_service()
     spread_service = get_gspread_service()
-    db_utils = DbUtils()
 
     while True:
         results = search_bank_messages(gmail_service, LABEL_ID)
 
         logging.info(f'found {len(results)} mails for processing')
         if len(results) > 0:
+            db_utils = DbUtils()
             for msg in results:
                 logging.info(f'message {msg[ID]} processing start')
                 try:
@@ -42,7 +42,7 @@ def main():
                     logging.error(f"Unexpected error: {msg[ID]}: {err}")
                     logging.info(f'message {msg[ID]} processing end')
 
-                    db_utils.close_connection()
+            db_utils.close_connection()
         time.sleep(5 * 60)
 
 
