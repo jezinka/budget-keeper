@@ -29,7 +29,8 @@ def main():
                     write_messages(spread_service, message)
                     logging.debug(f'message {msg[ID]} saved in sheet')
 
-                    db_utils.insert_transaction(message)
+                    category_id = db_utils.find_category(message.get_category())
+                    db_utils.insert_transaction(message, category_id)
                     logging.debug(f'message {msg[ID]} saved in db')
 
                     gmail_service.users().messages().modify(userId=ME_ID,

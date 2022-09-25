@@ -66,4 +66,6 @@ class Message:
             return 'bilety'
         if 'Finax' in self.who:
             return 'inwestycje'
+        if 'Steam' in self.title:
+            return 'gry'
         return ''
