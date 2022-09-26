@@ -38,9 +38,12 @@ def main():
                                                             body={'removeLabelIds': [LABEL_ID]}
                                                             ).execute()
                     logging.debug(f'message {msg[ID]} label removed')
+                    db_utils.insert_log('INFO', f"{msg[ID]}: saved successfully")
 
                 except Exception as err:
-                    logging.error(f"Unexpected error: {msg[ID]}: {err}")
+                    message_log = f"{msg[ID]}: {err}"
+                    logging.error(f"Unexpected error: {message_log}")
+                    db_utils.insert_log('ERROR', message_log)
                     logging.info(f'message {msg[ID]} processing end')
 
             db_utils.close_connection()

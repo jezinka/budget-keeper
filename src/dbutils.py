@@ -36,3 +36,12 @@ class DbUtils:
 
     def close_connection(self):
         self.connection.close()
+
+    def insert_log(self, log_type, message):
+        cursor = self.connection.cursor()
+        query = (
+                "insert into log (date , type, message) " +
+                "values (sysdate(), %s, %s);")
+        cursor.execute(query, (log_type, message))
+        self.connection.commit()
+        cursor.close()
