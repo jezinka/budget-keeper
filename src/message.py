@@ -18,6 +18,13 @@ class Message:
         self.set_amount(mail_dict[AMOUNT_KEY], income)
         self.set_operation_date(mail_dict)
 
+    def __str__(self):
+        log_message = self.title
+        if not (self.who is None):
+            log_message += ' ' + self.who
+        log_message += ': ' + self.get_amount()
+        return log_message
+
     def set_amount(self, amount, income):
         amount = float(amount.replace(',', '.').replace(' ', ''))
         self.amount = amount if income else (amount * -1)

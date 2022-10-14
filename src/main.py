@@ -38,7 +38,7 @@ def main():
                                                             body={'removeLabelIds': [LABEL_ID]}
                                                             ).execute()
                     logging.debug(f'message {msg[ID]} label removed')
-                    db_utils.insert_log('INFO', f"{msg[ID]}: saved successfully")
+                    db_utils.insert_log('INFO', f"{str(message)}: saved successfully")
 
                 except Exception as err:
                     message_log = f"{msg[ID]}: {err}"
