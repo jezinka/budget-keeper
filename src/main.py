@@ -5,14 +5,12 @@ from budget_logging import logging_config
 from const import LABEL_ID, ME_ID, ID
 from dbutils import DbUtils
 from read_emails import search_bank_messages, read_message
-from services import get_gspread_service, get_bank_gmail_service
-from write_spread import write_messages
+from services import get_bank_gmail_service
 
 
 def main():
     logging_config()
     gmail_service = get_bank_gmail_service()
-    spread_service = get_gspread_service()
 
     while True:
         results = search_bank_messages(gmail_service, LABEL_ID)
@@ -25,9 +23,6 @@ def main():
                 try:
                     message = read_message(gmail_service, msg)
                     logging.debug(f'message {msg[ID]} read')
-
-                    write_messages(spread_service, message)
-                    logging.debug(f'message {msg[ID]} saved in sheet')
 
                     category_id = db_utils.find_category(message.get_category())
                     db_utils.insert_transaction(message, category_id)

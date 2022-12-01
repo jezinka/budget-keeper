@@ -1,14 +1,9 @@
-SPREAD_KEY = '1oLnZrmCGFQaihM0qsIzwYXnfFI0Cus_yhWKz8daX0QI'
-WHEN_COLUMN = 'KIEDY'
-
 DATE_KEY = 'date'
 WHEN_KEY = 'kiedy'
 INCOME_KEY = 'income'
 AMOUNT_KEY = 'kwota'
 WHO_KEY = 'kto'
 TITLE_KEY = 'tytul'
-
-SERVICE_ACCOUNT_FILE = 'auth/bank_auth/service-account.json'
 
 BANK_SCOPES = ['https://mail.google.com/', 'https://www.googleapis.com/auth/spreadsheets']
 BANK_CLIENT_SECRET_FILE = 'auth/bank_auth/client_secret.json'
