@@ -26,7 +26,7 @@ class DbUtils:
 
     def find_category(self, category_name):
         cursor = self.connection.cursor()
-        query = ("select id from category where name = %s")
+        query = "select id from category where name = %s"
         cursor.execute(query, (category_name,))
         category = cursor.fetchone()
         category_id = None
