@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
-
-from const import AMOUNT_KEY, TITLE_KEY, WHO_KEY, WHEN_KEY, SHORT_F, LONG_F
+from const import AMOUNT_KEY, CURRENCY_KEY, TITLE_KEY, INCOME_KEY, PLN, WHO_KEY, WHEN_KEY, SHORT_F, LONG_F
+from forex_python.converter import CurrencyRates
 
 
 class Message:
@@ -12,10 +12,10 @@ class Message:
 
     receive_date = None  # date
 
-    def __init__(self, mail_dict, income):
+    def __init__(self, mail_dict):
         self.title = mail_dict[TITLE_KEY]
         self.set_who(mail_dict)
-        self.set_amount(mail_dict[AMOUNT_KEY], income)
+        self.set_amount(mail_dict)
         self.set_operation_date(mail_dict)
 
     def __str__(self):
@@ -25,9 +25,13 @@ class Message:
         log_message += ': ' + self.get_amount()
         return log_message
 
-    def set_amount(self, amount, income):
-        amount = float(amount.replace(',', '.').replace(' ', ''))
-        self.amount = amount if income else (amount * -1)
+    def set_amount(self, m_dict):
+        amount = float(m_dict[AMOUNT_KEY].replace(',', '.').replace(' ', ''))
+        currency = m_dict[CURRENCY_KEY]
+        if currency != PLN:
+            c = CurrencyRates()
+            amount *= c.get_rate(currency, PLN)
+        self.amount = amount if m_dict[INCOME_KEY] else (amount * -1)
 
     def set_who(self, mail_dict):
         self.who = mail_dict[WHO_KEY] if WHO_KEY in mail_dict and mail_dict[WHO_KEY] is not None else ''
@@ -76,3 +80,4 @@ class Message:
         if 'Steam' in self.title:
             return 'gry'
         return ''
+

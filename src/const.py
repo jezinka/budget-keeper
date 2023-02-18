@@ -1,9 +1,10 @@
-DATE_KEY = 'date'
-WHEN_KEY = 'kiedy'
+WHEN_KEY = 'when'
 INCOME_KEY = 'income'
-AMOUNT_KEY = 'kwota'
-WHO_KEY = 'kto'
-TITLE_KEY = 'tytul'
+AMOUNT_KEY = 'amount'
+CURRENCY_KEY = 'currency'
+WHO_KEY = 'who'
+TITLE_KEY = 'title'
+PLN = 'PLN'
 
 BANK_SCOPES = ['https://mail.google.com/', 'https://www.googleapis.com/auth/spreadsheets']
 BANK_CLIENT_SECRET_FILE = 'auth/bank_auth/client_secret.json'

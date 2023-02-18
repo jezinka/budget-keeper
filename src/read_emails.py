@@ -4,7 +4,7 @@ from base64 import urlsafe_b64decode
 
 from bs4 import BeautifulSoup
 
-from const import ME_ID, ID
+from const import ME_ID, ID, AMOUNT_KEY, CURRENCY_KEY, TITLE_KEY, WHO_KEY, WHEN_KEY, INCOME_KEY
 from message import Message
 
 
@@ -30,7 +30,7 @@ def process_message(payload):
 
     message_dict = prepare_message_dict(body, income)
 
-    message = Message(message_dict, income)
+    message = Message(message_dict)
     logging.info(message.get_title())
     message.set_receive_date(receive_date)
     return message
@@ -38,25 +38,27 @@ def process_message(payload):
 
 def prepare_message_dict(body, income):
     m = re.search(
-        r"Ile:[\+\-]?(?P<kwota>[\d ]*,\d{2}) PLN Kiedy:(?P<kiedy>\d{2}-\d{2}-\d{4})([\w ].*)Gdzie:(?P<tytul>\w.*)Tel",
+        rf"Ile:[\+\-]?(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}}) Kiedy:(?P<{WHEN_KEY}>\d{{2}}-\d{{2}}-\d{{4}})([\w ].*)Gdzie:(?P<{TITLE_KEY}>\w.*)Tel",
         body)
 
     if m is None:
         if income:
-            m = re.search(r"Tytuł:(?P<tytul>\w.*)Nadawca:(?P<kto>\w.*)Kwota:(?P<kwota>[\d ]*,\d{2}) PLN", body)
+            m = re.search(rf"Tytuł:(?P<{TITLE_KEY}>\w.*)Nadawca:(?P<{WHO_KEY}>\w.*)Kwota:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}})", body)
         else:
             m = re.search(
-                r"(Odbiorca:(?P<kto>.*))? Ile:(?P<kwota>[\d ]*,\d{2}) PLN Tytuł:(?P<tytul>.*) Kiedy:(?P<kiedy>\d{2}-\d{2}-\d{4})",
+                rf"(Odbiorca:(?P<{WHO_KEY}>.*))? Ile:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}}) Tytuł:(?P<{TITLE_KEY}>.*) Kiedy:(?P<{WHEN_KEY}>\d{{2}}-\d{{2}}-\d{{4}})",
                 body)
 
-    return m.groupdict()
+    m_groupdict = m.groupdict()
+    m_groupdict[INCOME_KEY] = income
+    return m_groupdict
 
 
 def is_income(body, headers):
     title = list(filter(lambda x: x.get("name").lower() == "subject", headers))[0].get("value")
     income = re.search('Wpływ|Wpłata', title) is not None
     if not income:
-        income = re.search(r"Ile:\+(?P<kwota>[\d ]*,\d{2})", body) is not None
+        income = re.search(rf"Ile:\+(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}})", body) is not None
     return income
 
 
