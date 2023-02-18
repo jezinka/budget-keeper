@@ -1,33 +1,5 @@
 version: "3.6"
 services:
-  app-db:
-    restart: unless-stopped
-    container_name: maria_db
-    image: linuxserver/mariadb:alpine
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=budget
-      - MYSQL_USER=budget-keeper
-      - MYSQL_PASSWORD=123Budget#
-      - TZ=Europe/Warsaw
-    volumes:
-      - "./scripts/schema.sql:/docker-entrypoint-initdb.d/schema.sql"
-    expose: 
-      - 3306
-    ports:
-      - "3306:3306"
-    networks:
-      - budget-net
-
   app:
     build: .
     restart: unless-stopped
-    depends_on:
-      - app-db
-    networks:
-      - budget-net
-
-networks:
-  budget-net:
-    name: budget-net
-    driver: bridge

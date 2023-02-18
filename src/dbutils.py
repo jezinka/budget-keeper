@@ -1,18 +1,17 @@
-import time
+
 
 import mysql.connector as mariadb
 
 import const
+import dbconfig
 
 
 class DbUtils:
     connection = None
 
     def __init__(self):
-        time.sleep(15)
-        self.connection = mariadb.connect(user=const.DB_USER, password=const.DB_PASSWORD,
-                                          host='maria_db',
-                                          database='budget')
+        self.connection = mariadb.connect(user=dbconfig.DB_USER, password=dbconfig.DB_PASSWORD,
+                                          host=dbconfig.DB_HOST, database=dbconfig.DB_NAME)
 
     def insert_transaction(self, message, category_id):
         cursor = self.connection.cursor()
@@ -40,7 +39,7 @@ class DbUtils:
     def insert_log(self, log_type, message):
         cursor = self.connection.cursor()
         query = (
-                "insert into log (date , type, message) " +
+                "insert into log (date, type, message) " +
                 "values (sysdate(), %s, %s);")
         cursor.execute(query, (log_type, message))
         self.connection.commit()
