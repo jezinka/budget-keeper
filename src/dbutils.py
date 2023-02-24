@@ -16,7 +16,7 @@ class DbUtils:
     def insert_transaction(self, message, category_id):
         cursor = self.connection.cursor()
         query = (
-                "insert into transaction (transaction_date, title, payee, amount, category_id) " +
+                "insert into expense (transaction_date, title, payee, amount, category_id) " +
                 "values (STR_TO_DATE(%s, '" + const.SHORT_F + "'), %s, %s, %s, %s);")
         cursor.execute(query, (message.get_date(), message.get_title(), message.get_who(),
                                message.get_amount(to_string=False), category_id))
