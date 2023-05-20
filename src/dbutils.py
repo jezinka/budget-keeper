@@ -44,3 +44,19 @@ class DbUtils:
         cursor.execute(query, (log_type, message))
         self.connection.commit()
         cursor.close()
+
+    def find_all_fixed_costs(self):
+        cursor = self.connection.cursor()
+        query = "select id, name, amount, conditions from fixed_cost"
+        cursor.execute(query)
+        fixed_costs = cursor.fetchall()
+        return fixed_costs
+
+    def insert_fixed_cost_payed(self, date, amount, id):
+        cursor = self.connection.cursor()
+        query = (
+                "insert into fixed_cost_payed(pay_date, amount, fixed_cost_id) " +
+                "values (STR_TO_DATE(%s, '" + const.SHORT_F + "'), %s, %s);")
+        cursor.execute(query, (date, amount, id))
+        self.connection.commit()
+        cursor.close()
