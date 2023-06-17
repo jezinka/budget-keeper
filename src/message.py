@@ -1,7 +1,9 @@
 import re
 from datetime import datetime
-from const import AMOUNT_KEY, CURRENCY_KEY, TITLE_KEY, INCOME_KEY, PLN, WHO_KEY, WHEN_KEY, SHORT_F, LONG_F
+
 from forex_python.converter import CurrencyRates
+
+from const import AMOUNT_KEY, CURRENCY_KEY, TITLE_KEY, INCOME_KEY, PLN, WHO_KEY, WHEN_KEY, SHORT_F, LONG_F
 
 
 class Message:
@@ -44,7 +46,7 @@ class Message:
 
     def get_date(self):
         date = self.operation_date if self.operation_date is not None else self.receive_date
-        return date.strftime(SHORT_F)
+        return date
 
     def get_title(self):
         return self.title
