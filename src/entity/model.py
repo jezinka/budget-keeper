@@ -34,15 +34,21 @@ class Log(BaseModel):
     message = TextField()
 
 
-class Fixed_Cost(BaseModel):
+class FixedCost(BaseModel):
     id = DecimalField()
     name = TextField()
     amount = DoubleField()
     conditions = TextField()
 
+    class Meta:
+        table_name = 'fixed_cost'
 
-class Fixed_Cost_Payed(BaseModel):
+
+class FixedCostPayed(BaseModel):
     id = DecimalField()
     pay_date = DateTimeField(default=datetime.now)
     amount = DoubleField()
-    fixed_cost = ForeignKeyField(Fixed_Cost)
+    fixed_cost = ForeignKeyField(FixedCost)
+
+    class Meta:
+        table_name = 'fixed_cost_payed'

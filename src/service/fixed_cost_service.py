@@ -1,12 +1,12 @@
 import json
 
-from src.entity.model import Fixed_Cost, Fixed_Cost_Payed
+from src.entity.model import FixedCost, FixedCostPayed
 
 
 class FixedCostService:
 
     def check(self, message):
-        fixed_costs = Fixed_Cost.select()
+        fixed_costs = FixedCost.select()
         fixed_cost = None
         for cost in fixed_costs:
 
@@ -21,6 +21,6 @@ class FixedCostService:
         return fixed_cost
 
     def mark_as_payed(self, fixed_cost, message):
-        Fixed_Cost_Payed.create(pay_date=message.get_date(),
-                                amount=message.get_amount(to_string=False),
-                                fixed_cost=fixed_cost)
+        FixedCostPayed.create(pay_date=message.get_date(),
+                              amount=message.get_amount(to_string=False),
+                              fixed_cost=fixed_cost)

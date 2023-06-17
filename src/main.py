@@ -54,7 +54,7 @@ def main():
 
                 logging.info(f'message {msg[ID]} processing end')
 
-        time.sleep(5)
+        time.sleep(5 * 60)
 
 
 if __name__ == "__main__":
