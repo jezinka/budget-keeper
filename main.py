@@ -2,13 +2,13 @@ import logging
 import time
 
 from budget_logging import logging_config
+from category_repository import get_category_by_name
 from const import LABEL_ID, ME_ID, ID
+from expense_repository import create_expense
+from fixed_cost_service import FixedCostService
 from gmail_service import get_bank_gmail_service
+from log_repository import create_log
 from read_emails import search_bank_messages, read_message
-from src.repository.category_repository import get_category_by_name
-from src.repository.expense_repository import create_expense
-from src.repository.log_repository import create_log
-from src.service.fixed_cost_service import FixedCostService
 
 
 def main():

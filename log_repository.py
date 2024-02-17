@@ -1,4 +1,4 @@
-from src.entity.model import Log
+from model import Log
 
 
 def create_log(type, message):

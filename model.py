@@ -2,7 +2,7 @@ from datetime import datetime
 
 from peewee import *
 
-from src import dbconfig
+import dbconfig
 
 db = MySQLDatabase(dbconfig.DB_NAME, user=dbconfig.DB_USER, password=dbconfig.DB_PASSWORD, host=dbconfig.DB_HOST,
                    port=3306)

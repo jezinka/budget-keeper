@@ -1,6 +1,6 @@
 import json
 
-from src.entity.model import FixedCost, FixedCostPayed
+from model import FixedCost, FixedCostPayed
 
 
 class FixedCostService:

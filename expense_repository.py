@@ -1,4 +1,4 @@
-from src.entity.model import Expense
+from model import Expense
 
 
 def create_expense(category, message):
