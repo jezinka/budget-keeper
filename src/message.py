@@ -69,17 +69,30 @@ class Message:
         if self.title is None:
             return ''
 
-        if 'końcówek' in self.title:
+        title = self.title.lower()
+        if 'końcówek' in title:
             return 'końcówki'
-        if 'IKZE' in self.title:
+        if 'ikze' in title:
             return 'emerytura'
-        if 'Legimi' in self.title or 'Doładowanie telefonu' in self.title or 'spotify' in self.title.lower():
+        if 'legimi' in title or 'doładowanie telefonu' in title or 'spotify' in title or 'disney' in title:
             return 'abonament'
-        if 'Urbancard' in self.title:
+        if 'urbancard' in title:
             return 'bilety'
-        if 'Finax' in self.who:
+        if 'finax' in self.who or '27534' in title:
             return 'inwestycje'
-        if 'Steam' in self.title:
+        if 'steam' in title:
             return 'gry'
+        if 'apteka' in title:
+            return 'zdrowie'
+        if 'zabka' in title and self.amount > -30:
+            return 'osiedlowy'
+        if 'lidl' in title or 'biedronka' in title or 'miedzy twoimi kontami' in title:
+            return 'na życie'
+        if 'fryzjer' in title:
+            return 'fryzjer'
+        if 'szkolna kasa' in self.who:
+            return 'szkoła'
+        if ('stowarzyszenie' in title or 'siepomaga' in title or 'darowizna' in title
+                or 'pomoc' in title or 'fundacja' in title):
+            return 'darowizny'
         return ''
-
