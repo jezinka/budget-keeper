@@ -27,7 +27,9 @@ def main():
                     message = read_message(gmail_service, msg)
                     logging.debug(f'message {msg[ID]} read')
 
-                    category = get_category_by_name(message.get_category())
+                    category_name = message.get_category()
+                    logging.debug(f'message {msg[ID]} category name: {category_name}')
+                    category = get_category_by_name(category_name)
                     create_expense(category, message)
                     logging.debug(f'message {msg[ID]} saved in db')
 
