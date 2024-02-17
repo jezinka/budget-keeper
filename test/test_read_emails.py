@@ -1,6 +1,6 @@
 import unittest
 
-from read_emails import prepare_message_dict
+from src.read_emails import prepare_message_dict
 
 
 class TestReadMails(unittest.TestCase):
