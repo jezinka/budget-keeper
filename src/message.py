@@ -64,35 +64,3 @@ class Message:
     def get_month(self):
         date = self.operation_date if self.operation_date is not None else self.receive_date
         return int(date.strftime('%m'))
-
-    def get_category(self):
-        if self.title is None:
-            return ''
-
-        title = self.title.lower()
-        if 'końcówek' in title:
-            return 'końcówki'
-        if 'ikze' in title:
-            return 'emerytura'
-        if 'legimi' in title or 'doładowanie telefonu' in title or 'spotify' in title or 'disney' in title:
-            return 'abonament'
-        if 'urbancard' in title:
-            return 'bilety'
-        if 'finax' in self.who or '27534' in title:
-            return 'inwestycje'
-        if 'steam' in title:
-            return 'gry'
-        if 'apteka' in title:
-            return 'zdrowie'
-        if 'zabka' in title and self.amount > -30:
-            return 'osiedlowy'
-        if 'lidl' in title or 'biedronka' in title or 'miedzy twoimi kontami' in title:
-            return 'na życie'
-        if 'fryzjer' in title:
-            return 'fryzjer'
-        if 'szkolna kasa' in self.who:
-            return 'szkoła'
-        if ('stowarzyszenie' in title or 'siepomaga' in title or 'darowizna' in title
-                or 'pomoc' in title or 'fundacja' in title):
-            return 'darowizny'
-        return ''

@@ -2,7 +2,7 @@ import logging
 import time
 
 from budget_logging import logging_config
-from category_repository import get_category_by_name
+from category_service import match_category
 from const import LABEL_ID, ME_ID, ID
 from expense_repository import create_expense
 from fixed_cost_service import FixedCostService
@@ -27,9 +27,9 @@ def main():
                     message = read_message(gmail_service, msg)
                     logging.debug(f'message {msg[ID]} read')
 
-                    category_name = message.get_category()
-                    logging.debug(f'message {msg[ID]} category name: {category_name}')
-                    category = get_category_by_name(category_name)
+                    category = match_category(message)
+                    if category is not None:
+                        logging.debug(f'message {msg[ID]} category name: {category.name}')
                     create_expense(category, message)
                     logging.debug(f'message {msg[ID]} saved in db')
 

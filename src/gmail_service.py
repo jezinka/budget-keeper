@@ -12,7 +12,7 @@ from const import BANK_CLIENT_SECRET_FILE, BANK_SCOPES, BANK_AUTH_CREDENTIALS_DA
 def get_bank_gmail_service():
     if not os.path.exists(BANK_AUTH_CREDENTIALS_DAT):
         flow = InstalledAppFlow.from_client_secrets_file(BANK_CLIENT_SECRET_FILE, BANK_SCOPES)
-        authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true')
+        flow.authorization_url(access_type='offline', include_granted_scopes='true')
         credentials = flow.run_local_server()
         with open(BANK_AUTH_CREDENTIALS_DAT, 'wb') as credentials_dat:
             pickle.dump(credentials, credentials_dat)
