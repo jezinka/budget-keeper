@@ -2,7 +2,7 @@ import logging
 import time
 
 from budget_logging import logging_config
-from category_service import match_category
+from category_service import CategoryService
 from const import LABEL_ID, ME_ID, ID
 from expense_repository import create_expense
 from fixed_cost_service import FixedCostService
@@ -15,7 +15,7 @@ def main():
     logging_config()
     gmail_service = get_bank_gmail_service()
     fixed_cost_service = FixedCostService()
-
+    category_service = CategoryService()
     while True:
         results = search_bank_messages(gmail_service, LABEL_ID)
 
@@ -27,7 +27,7 @@ def main():
                     message = read_message(gmail_service, msg)
                     logging.debug(f'message {msg[ID]} read')
 
-                    category = match_category(message)
+                    category = category_service.match_category(message)
                     if category is not None:
                         logging.debug(f'message {msg[ID]} category name: {category.name}')
                     create_expense(category, message)
