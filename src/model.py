@@ -25,6 +25,7 @@ class Expense(BaseModel):
     payee = TextField()
     amount = DoubleField()
     category = ForeignKeyField(Category)
+    automatic_category = BooleanField(default=0)
 
 
 class Log(BaseModel):
