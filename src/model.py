@@ -52,3 +52,12 @@ class FixedCostPayed(BaseModel):
 
     class Meta:
         table_name = 'fixed_cost_payed'
+
+
+class CategoryCondition(BaseModel):
+    id = DecimalField()
+    conditions = TextField()
+    category = ForeignKeyField(Category)
+
+    class Meta:
+        table_name = 'category_condition'
