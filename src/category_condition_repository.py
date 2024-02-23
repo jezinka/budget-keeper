@@ -1,7 +1,9 @@
-from model import CategoryCondition
+from model import CategoryCondition, Category
 
 
 class CategoryConditionRepository:
 
     def get_all(self):
-        return CategoryCondition.select()
+        return (CategoryCondition
+                .select()
+                .join(Category))
