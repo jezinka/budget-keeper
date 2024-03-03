@@ -6,9 +6,9 @@ WHO_KEY = 'who'
 TITLE_KEY = 'title'
 PLN = 'PLN'
 
-BANK_SCOPES = ['https://mail.google.com/', 'https://www.googleapis.com/auth/spreadsheets']
-BANK_CLIENT_SECRET_FILE = 'auth/bank_auth/client_secret.json'
-BANK_AUTH_CREDENTIALS_DAT = 'auth/bank_auth/credentials.dat'
+BANK_SCOPES = ['https://mail.google.com/']
+BANK_CLIENT_SECRET_FILE = '../auth/bank_auth/client_secret.json'
+BANK_AUTH_CREDENTIALS_DAT = '../auth/bank_auth/credentials.dat'
 
 LABEL_ID = 'Label_6824676119774138946'
 ME_ID = 'me'
