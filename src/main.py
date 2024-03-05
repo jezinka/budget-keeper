@@ -4,8 +4,8 @@ import time
 from budget_logging import logging_config
 from const import LABEL_ID, ME_ID, ID
 from gmail_service import get_bank_gmail_service
+from kafka_communication import KafkaCommunication
 from read_emails import search_bank_messages, read_message
-from src.kafka_communication import KafkaCommunication
 
 
 def main():
