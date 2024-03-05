@@ -43,7 +43,9 @@ def prepare_message_dict(body, income):
 
     if m is None:
         if income:
-            m = re.search(rf"Tytuł:(?P<{TITLE_KEY}>\w.*)Nadawca:(?P<{WHO_KEY}>\w.*)Kwota:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}})", body)
+            m = re.search(
+                rf"Tytuł:(?P<{TITLE_KEY}>\w.*)Nadawca:(?P<{WHO_KEY}>\w.*)Kwota:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}})",
+                body)
         else:
             m = re.search(
                 rf"(Odbiorca:(?P<{WHO_KEY}>.*))? Ile:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}}) Tytuł:(?P<{TITLE_KEY}>.*) Kiedy:(?P<{WHEN_KEY}>\d{{2}}-\d{{2}}-\d{{4}})",

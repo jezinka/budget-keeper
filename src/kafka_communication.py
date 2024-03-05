@@ -18,9 +18,9 @@ class KafkaCommunication:
                            {
                                'title': message.get_title(),
                                'payee': message.get_who(),
-                               'amount': message.get_amount(True),
+                               'amount': message.get_amount(False),
                                'transactionDate': message.get_date(),
-                               'sendDate': datetime.now().isoformat()
+                               'sendDate': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                            })
 
     def send_log_to_kafka(self, level, message):
@@ -28,5 +28,5 @@ class KafkaCommunication:
                            {
                                'level': level,
                                'message': message,
-                               'date': datetime.now().isoformat()
+                               'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                            })
