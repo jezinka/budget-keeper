@@ -19,7 +19,7 @@ class KafkaCommunication:
                                'title': message.get_title(),
                                'payee': message.get_who(),
                                'amount': message.get_amount(False),
-                               'transactionDate': message.get_date(),
+                               'transactionDate': message.get_date().strftime('%Y-%m-%d %H:%M:%S'),
                                'sendDate': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                            })
 
