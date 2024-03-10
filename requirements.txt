@@ -5,3 +5,4 @@ beautifulsoup4~=4.8.2
 forex-python==1.6
 peewee~=3.16.2
 pymysql~=1.0.3
+kafka-python~=2.0.2
