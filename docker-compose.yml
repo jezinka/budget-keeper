@@ -6,23 +6,7 @@ services:
     networks:
       - budget
     depends_on:
-      - db
       - kafka
-  db:
-    restart: always
-    container_name: db
-    image: mariadb:latest
-    environment:
-      - MYSQL_DATABASE=budget
-      - MYSQL_USER=budget-keeper
-      - MYSQL_PASSWORD=123Budget#
-      - MYSQL_ROOT_PASSWORD=rootpassword
-    volumes:
-      - "./sql/init:/docker-entrypoint-initdb.d/"
-    ports:
-      - "3306:3306"
-    networks:
-      - budget
   zookeeper:
     restart: always
     image: docker.io/bitnami/zookeeper:3.8
@@ -47,7 +31,7 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://kafka:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
     depends_on:
       - zookeeper
