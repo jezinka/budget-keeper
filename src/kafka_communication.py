@@ -13,6 +13,12 @@ class KafkaCommunication:
             value_serializer=lambda v: json.dumps(v, default=str).encode('utf-8')
         )
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.producer.close()
+
     def send_expense_to_kafka(self, message):
         self.producer.send('expense',
                            {

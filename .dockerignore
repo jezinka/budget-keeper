@@ -2,3 +2,7 @@ venv
 .idea
 __pycache__
 .git
+test
+sql
+docker_images
+scripts
