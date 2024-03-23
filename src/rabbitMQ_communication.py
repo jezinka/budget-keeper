@@ -3,13 +3,16 @@ from datetime import datetime
 
 import pika
 
+from const import RABBITMQ_USER, RABBITMQ_PASSWORD
+
 
 class RabbitMQCommunication:
     connection = None
     channel = None
 
     def __init__(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
+        credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASSWORD)
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq', credentials=credentials))
         self.channel = self.connection.channel()
 
     def __enter__(self):
