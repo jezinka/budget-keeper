@@ -1,45 +1,24 @@
 version: "3.6"
 services:
   app:
-    image: budget-keeper_app:latest
+    build: '.'
+    container_name: "app"
     restart: unless-stopped
     networks:
       - budget
     depends_on:
-      - kafka
-  zookeeper:
-    restart: always
-    image: docker.io/bitnami/zookeeper:3.8
+      - rabbitmq
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: "rabbitmq"
     ports:
-      - "2181:2181"
+      - "5672:5672"
+      - "15672:15672"
     volumes:
-      - "zookeeper-volume:/bitnami"
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ./init/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./init/definitions.json:/etc/rabbitmq/definitions.json:ro
     networks:
       - budget
-  kafka:
-    restart: always
-    image: docker.io/bitnami/kafka:3.3
-    ports:
-      - "9093:9093"
-    volumes:
-      - "kafka-volume:/bitnami"
-    environment:
-      - KAFKA_BROKER_ID=1
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://kafka:9093
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
-    depends_on:
-      - zookeeper
-    networks:
-      - budget
-volumes:
-  kafka-volume:
-  zookeeper-volume:
 
 networks:
   budget:
