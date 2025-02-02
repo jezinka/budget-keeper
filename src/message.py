@@ -31,7 +31,7 @@ class Message:
         amount = float(m_dict[AMOUNT_KEY].replace(',', '.').replace(' ', ''))
         from_currency = m_dict[CURRENCY_KEY]
         if from_currency != PLN:
-            amount = currency.convert(from_currency, PLN, amount)
+            amount = float(currency.convert(from_currency, PLN, amount))
         self.amount = amount if m_dict[INCOME_KEY] else (amount * -1)
 
     def set_who(self, mail_dict):
