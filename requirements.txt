@@ -2,7 +2,7 @@ gspread~=3.7.0
 google-api-python-client~=2.34.0
 mysql-connector-python~=8.0.30
 beautifulsoup4~=4.8.2
-forex-python==1.6
+currency-ch==0.1.0
 peewee~=3.16.2
 pymysql~=1.0.3
 kafka-python~=2.0.2

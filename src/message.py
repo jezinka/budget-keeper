@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 
-from forex_python.converter import CurrencyRates
+import currency
 
 from const import AMOUNT_KEY, CURRENCY_KEY, TITLE_KEY, INCOME_KEY, PLN, WHO_KEY, WHEN_KEY, SHORT_F, LONG_F
 
@@ -29,10 +29,9 @@ class Message:
 
     def set_amount(self, m_dict):
         amount = float(m_dict[AMOUNT_KEY].replace(',', '.').replace(' ', ''))
-        currency = m_dict[CURRENCY_KEY]
-        if currency != PLN:
-            c = CurrencyRates()
-            amount *= c.get_rate(currency, PLN)
+        from_currency = m_dict[CURRENCY_KEY]
+        if from_currency != PLN:
+            amount = currency.convert(from_currency, PLN, amount)
         self.amount = amount if m_dict[INCOME_KEY] else (amount * -1)
 
     def set_who(self, mail_dict):
