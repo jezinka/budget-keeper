@@ -10,10 +10,7 @@ from message import Message
 
 def search_bank_messages(service, label):
     result = service.users().messages().list(userId='me', labelIds=label).execute()
-    messages = []
-    if 'messages' in result:
-        messages.extend(result['messages'])
-    return messages
+    return result.get('messages', [])
 
 
 def read_message(service, mail):
@@ -25,11 +22,8 @@ def process_message(payload):
     headers = payload.get("headers")
     body = prepare_body(payload)
     income = is_income(body, headers)
-
-    receive_date = list(filter(lambda x: x.get("name").lower() == "date", headers))[0].get("value")
-
+    receive_date = next(header.get("value") for header in headers if header.get("name").lower() == "date")
     message_dict = prepare_message_dict(body, income)
-
     message = Message(message_dict)
     logging.info(message.get_title())
     message.set_receive_date(receive_date)
@@ -37,19 +31,19 @@ def process_message(payload):
 
 
 def prepare_message_dict(body, income):
-    m = re.search(
+    patterns = [
         rf"Ile:[\+\-]?(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}}) Kiedy:(?P<{WHEN_KEY}>\d{{2}}-\d{{2}}-\d{{4}})([\w ].*)Gdzie:(?P<{TITLE_KEY}>[\w\"].*)Tel",
-        body)
+        rf"Tytuł:(?P<{TITLE_KEY}>\w.*)Nadawca:(?P<{WHO_KEY}>\w.*)Kwota:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}})",
+        rf"(Odbiorca:(?P<{WHO_KEY}>.*))? Ile:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}}) Tytuł:(?P<{TITLE_KEY}>.*) Kiedy:(?P<{WHEN_KEY}>\d{{2}}-\d{{2}}-\d{{4}})"
+    ]
+    m = None
+    for pattern in patterns:
+        m = re.search(pattern, body)
+        if m:
+            break
 
     if m is None:
-        if income:
-            m = re.search(
-                rf"Tytuł:(?P<{TITLE_KEY}>\w.*)Nadawca:(?P<{WHO_KEY}>\w.*)Kwota:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}})",
-                body)
-        else:
-            m = re.search(
-                rf"(Odbiorca:(?P<{WHO_KEY}>.*))? Ile:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}}) Tytuł:(?P<{TITLE_KEY}>.*) Kiedy:(?P<{WHEN_KEY}>\d{{2}}-\d{{2}}-\d{{4}})",
-                body)
+        raise ValueError("No match found in the email body")
 
     m_groupdict = m.groupdict()
     m_groupdict[INCOME_KEY] = income
@@ -57,15 +51,12 @@ def prepare_message_dict(body, income):
 
 
 def is_income(body, headers):
-    title = list(filter(lambda x: x.get("name").lower() == "subject", headers))[0].get("value")
-    income = re.search('Wpływ|Wpłata', title) is not None
-    if not income:
-        income = re.search(rf"Ile:\+(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}})", body) is not None
+    title = next(header.get("value") for header in headers if header.get("name").lower() == "subject")
+    income = bool(re.search('Wpływ|Wpłata', title)) or bool(re.search(rf"Ile:\+(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}})", body))
     return income
 
 
 def prepare_body(payload):
     body = urlsafe_b64decode(payload.get("body")['data']).decode("utf-8", "replace")
-    soup = BeautifulSoup(body, 'html.parser')
-    text = soup.table.table.get_text().strip()
+    text = BeautifulSoup(body, 'html.parser').table.table.get_text().strip()
     return re.sub(r'\s{2}', '', text)

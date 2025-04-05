@@ -5,6 +5,5 @@ beautifulsoup4~=4.8.2
 currency-ch==0.1.0
 peewee~=3.16.2
 pymysql~=1.0.3
-kafka-python~=2.0.2
 pika~=1.3.2
 pika-stubs==0.1.3
