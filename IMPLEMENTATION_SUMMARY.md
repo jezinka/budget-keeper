@@ -32,14 +32,17 @@ Successfully implemented post-fetch extraction and cross-email search functional
   - Configurable amount tolerance (default: ±0.01)
   - Recursive body text extraction from multipart messages
 
-#### 3. `src/receipt_extractor.py` (258 lines)
+#### 3. `src/receipt_extractor.py` (290+ lines)
 - **Purpose**: Extract item-level details from receipt emails
 - **Key Class**: `ReceiptExtractor`
 - **Key Methods**:
   - `extract_items_from_message(message)` - Main extraction method
+  - `_extract_from_allegro_jsonld(soup)` - **NEW**: Allegro JSON-LD parser
   - `_extract_from_html(html_body)` - HTML parsing using BeautifulSoup
   - `_extract_from_text(text_body)` - Plain text fallback parsing
 - **Features**:
+  - **Optimized for Allegro**: Extracts from JSON-LD structured data (most reliable)
+  - Parses schema.org Order structure with product information
   - Multiple HTML extraction strategies (tables, lists, paragraphs)
   - Filters numeric-only data (prices, dates)
   - Handles multipart messages (HTML + plain text)
@@ -86,7 +89,13 @@ Tests for item extraction:
 - Number detection helper
 - Batch extraction from multiple messages
 
-#### 8. `test/test_integration.py` (157 lines, 3 tests)
+#### 8. `test/test_allegro_extractor.py` (NEW, 150+ lines, 3 tests)
+Tests for Allegro-specific extraction:
+- JSON-LD parsing from Allegro email structure
+- Multiple products in single order
+- Real Allegro email validation
+
+#### 9. `test/test_integration.py` (157 lines, 3 tests)
 End-to-end integration tests:
 - Successful enrichment with receipt details
 - No amount/date found scenario
@@ -115,13 +124,14 @@ Added Python-specific ignore patterns:
 
 ### All New Tests Passing
 ```
-Ran 25 tests in 0.005s
+Ran 28 tests in 0.022s
 OK
 ```
 
 **Breakdown**:
 - Email Parser: 16 tests ✓
 - Receipt Extractor: 6 tests ✓
+- Allegro Extractor: 3 tests ✓
 - Integration: 3 tests ✓
 
 ### Security Scan

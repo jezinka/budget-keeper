@@ -1,6 +1,8 @@
 """
 Module for extracting item-level details from receipt emails.
+Specialized for Allegro emails with JSON-LD structured data.
 """
+import json
 import logging
 import re
 from base64 import urlsafe_b64decode
@@ -94,6 +96,7 @@ class ReceiptExtractor:
     def _extract_from_html(self, html_body: str) -> List[str]:
         """
         Extract item descriptions from HTML using BeautifulSoup.
+        Prioritizes Allegro JSON-LD structured data for reliable extraction.
         
         Args:
             html_body: HTML content of email
@@ -106,7 +109,13 @@ class ReceiptExtractor:
         try:
             soup = BeautifulSoup(html_body, 'html.parser')
             
-            # Strategy 1: Look for table rows with product information
+            # Strategy 1: Extract from Allegro JSON-LD structured data (most reliable)
+            allegro_items = self._extract_from_allegro_jsonld(soup)
+            if allegro_items:
+                logging.info(f'Extracted {len(allegro_items)} items from Allegro JSON-LD')
+                return allegro_items
+            
+            # Strategy 2: Look for table rows with product information
             tables = soup.find_all('table')
             for table in tables:
                 rows = table.find_all('tr')
@@ -118,7 +127,7 @@ class ReceiptExtractor:
                         if len(text) > 15 and not self._is_just_numbers(text):
                             items.append(text)
             
-            # Strategy 2: Look for paragraphs with product-like content
+            # Strategy 3: Look for paragraphs with product-like content
             paragraphs = soup.find_all('p')
             for p in paragraphs:
                 text = p.get_text(strip=True)
@@ -131,7 +140,7 @@ class ReceiptExtractor:
                         # Has multiple words (descriptive)
                         items.append(text)
             
-            # Strategy 3: Look for list items
+            # Strategy 4: Look for list items
             list_items = soup.find_all('li')
             for li in list_items:
                 text = li.get_text(strip=True)
@@ -143,6 +152,62 @@ class ReceiptExtractor:
         
         # Remove duplicates while preserving order
         return list(dict.fromkeys(items))
+    
+    def _extract_from_allegro_jsonld(self, soup: BeautifulSoup) -> List[str]:
+        """
+        Extract product names from Allegro's JSON-LD structured data.
+        
+        Allegro emails contain JSON-LD with schema.org Order structure that includes
+        product names in the orderedItem field.
+        
+        Args:
+            soup: BeautifulSoup parsed HTML
+            
+        Returns:
+            List of product names from JSON-LD or empty list if not found
+        """
+        items = []
+        
+        try:
+            # Find all script tags with type="application/ld+json"
+            json_ld_scripts = soup.find_all('script', type='application/ld+json')
+            
+            for script in json_ld_scripts:
+                if not script.string:
+                    continue
+                
+                try:
+                    # Parse the JSON-LD content
+                    data = json.loads(script.string)
+                    
+                    # Handle both single object and array
+                    items_to_check = data if isinstance(data, list) else [data]
+                    
+                    for item in items_to_check:
+                        # Look for Order objects with orderedItem
+                        if item.get('@type') == 'Order' and 'orderedItem' in item:
+                            ordered_items = item['orderedItem']
+                            if not isinstance(ordered_items, list):
+                                ordered_items = [ordered_items]
+                            
+                            for ordered_item in ordered_items:
+                                # Extract product name from orderedItem
+                                if 'orderedItem' in ordered_item:
+                                    product = ordered_item['orderedItem']
+                                    if isinstance(product, dict) and 'name' in product:
+                                        product_name = product['name']
+                                        if product_name and len(product_name) > 10:
+                                            items.append(product_name)
+                                            logging.debug(f'Found Allegro product: {product_name}')
+                
+                except json.JSONDecodeError as e:
+                    logging.debug(f'Failed to parse JSON-LD: {e}')
+                    continue
+        
+        except Exception as e:
+            logging.error(f'Error extracting Allegro JSON-LD: {e}')
+        
+        return items
     
     def _extract_from_text(self, text_body: str) -> List[str]:
         """

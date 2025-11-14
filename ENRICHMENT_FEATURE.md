@@ -57,7 +57,9 @@ Searches for emails by date and amount:
 ### `src/receipt_extractor.py`
 Extracts item details from receipt emails:
 - `ReceiptExtractor.extract_items_from_message()` - Main extraction method
-- Supports HTML parsing (tables, lists, paragraphs)
+- **Optimized for Allegro emails**: Extracts from JSON-LD structured data (most reliable)
+- `_extract_from_allegro_jsonld()` - Parses schema.org Order structure with product names
+- Fallback to HTML parsing (tables, lists, paragraphs) for other formats
 - Fallback to plain text parsing
 - Filters out numeric-only data (prices, dates)
 
@@ -91,11 +93,12 @@ receipt_messages = searcher.search_receipt_emails(date, amount, days_range=14)
 The feature includes comprehensive test coverage:
 - **16 tests** for email parser (amount/date extraction)
 - **6 tests** for receipt extractor (HTML/text parsing)
+- **3 tests** for Allegro-specific extraction (JSON-LD parsing)
 - **3 integration tests** (end-to-end enrichment flow)
 
 Run tests:
 ```bash
-PYTHONPATH=/home/runner/work/budget-keeper/budget-keeper/src python -m unittest test.test_email_parser test.test_receipt_extractor test.test_integration -v
+PYTHONPATH=/home/runner/work/budget-keeper/budget-keeper/src python -m unittest test.test_email_parser test.test_receipt_extractor test.test_allegro_extractor test.test_integration -v
 ```
 
 ## Example Use Case
