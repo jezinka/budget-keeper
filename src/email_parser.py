@@ -5,20 +5,6 @@ from typing import Optional, List
 
 
 def extract_amount(text: str) -> Optional[Decimal]:
-    """
-    Extract amount from text, handling Polish currency format.
-    
-    Examples:
-        "82,87 zł" -> Decimal("82.87")
-        "1 234,56 PLN" -> Decimal("1234.56")
-        "100,00 zł" -> Decimal("100.00")
-    
-    Args:
-        text: Text containing amount information
-        
-    Returns:
-        Decimal amount or None if not found
-    """
     # Pattern for Polish currency format with spaces as thousands separator
     # Handles: "82,87 zł", "1 234,56 PLN", "100,00 zł"
     pattern = r'(\d{1,3}(?:[\s\u00A0]\d{3})*(?:[.,]\d{2})?)[\s\u00A0]*(zł|PLN)?'
@@ -42,15 +28,6 @@ def extract_amount(text: str) -> Optional[Decimal]:
 
 
 def extract_all_amounts(text: str) -> List[Decimal]:
-    """
-    Extract all amounts from text.
-    
-    Args:
-        text: Text containing multiple amounts
-        
-    Returns:
-        List of Decimal amounts found
-    """
     # Pattern for Polish currency format
     pattern = r'(\d{1,3}(?:[\s\u00A0]\d{3})*(?:[.,]\d{2})?)[\s\u00A0]*(zł|PLN)?'
     
@@ -73,19 +50,6 @@ def extract_all_amounts(text: str) -> List[Decimal]:
 
 
 def extract_date(text: str) -> Optional[datetime]:
-    """
-    Extract date from text in Polish format.
-    
-    Examples:
-        "11.11.2025" -> datetime(2025, 11, 11)
-        "05-01-2023" -> datetime(2023, 1, 5)
-    
-    Args:
-        text: Text containing date information
-        
-    Returns:
-        datetime object or None if not found
-    """
     # Pattern for dd.mm.yyyy format
     pattern_dot = r'(\d{1,2})\.(\d{1,2})\.(\d{4})'
     match = re.search(pattern_dot, text)
@@ -112,15 +76,6 @@ def extract_date(text: str) -> Optional[datetime]:
 
 
 def extract_all_dates(text: str) -> List[datetime]:
-    """
-    Extract all dates from text.
-    
-    Args:
-        text: Text containing multiple dates
-        
-    Returns:
-        List of datetime objects found
-    """
     dates = []
     
     # Pattern for dd.mm.yyyy format
@@ -145,14 +100,4 @@ def extract_all_dates(text: str) -> List[datetime]:
 
 
 def normalize_amount(amount: Decimal, tolerance: Decimal = Decimal('0.01')) -> Decimal:
-    """
-    Normalize amount for comparison purposes.
-    
-    Args:
-        amount: The amount to normalize
-        tolerance: Tolerance for comparison (default 0.01)
-        
-    Returns:
-        Normalized amount
-    """
     return amount.quantize(Decimal('0.01'))

@@ -8,18 +8,8 @@ from bs4 import BeautifulSoup
 
 
 class ReceiptExtractor:
-    """Extracts item descriptions and details from receipt emails"""
     
     def extract_items_from_message(self, message: Dict[str, Any]) -> List[str]:
-        """
-        Extract item descriptions from a receipt email message.
-        
-        Args:
-            message: Gmail message dictionary
-            
-        Returns:
-            List of item descriptions found in the receipt
-        """
         payload = message.get('payload', {})
         
         # Try HTML parsing first (more structured)
@@ -40,7 +30,6 @@ class ReceiptExtractor:
         return []
     
     def _get_html_body(self, payload: Dict[str, Any]) -> Optional[str]:
-        """Extract HTML body from message payload"""
         # Check if body is directly in payload
         if 'body' in payload and 'data' in payload['body']:
             mime_type = payload.get('mimeType', '')
@@ -63,7 +52,6 @@ class ReceiptExtractor:
         return None
     
     def _get_text_body(self, payload: Dict[str, Any]) -> Optional[str]:
-        """Extract plain text body from message payload"""
         # Check if body is directly in payload
         if 'body' in payload and 'data' in payload['body']:
             mime_type = payload.get('mimeType', '')
@@ -90,16 +78,6 @@ class ReceiptExtractor:
         return None
     
     def _extract_from_html(self, html_body: str) -> List[str]:
-        """
-        Extract item descriptions from HTML using BeautifulSoup.
-        Prioritizes Allegro JSON-LD structured data for reliable extraction.
-        
-        Args:
-            html_body: HTML content of email
-            
-        Returns:
-            List of item descriptions
-        """
         items = []
         
         try:
@@ -150,18 +128,6 @@ class ReceiptExtractor:
         return list(dict.fromkeys(items))
     
     def _extract_from_allegro_jsonld(self, soup: BeautifulSoup) -> List[str]:
-        """
-        Extract product names from Allegro's JSON-LD structured data.
-        
-        Allegro emails contain JSON-LD with schema.org Order structure that includes
-        product names in the orderedItem field.
-        
-        Args:
-            soup: BeautifulSoup parsed HTML
-            
-        Returns:
-            List of product names from JSON-LD or empty list if not found
-        """
         items = []
         
         try:
@@ -206,15 +172,6 @@ class ReceiptExtractor:
         return items
     
     def _extract_from_text(self, text_body: str) -> List[str]:
-        """
-        Extract item descriptions from plain text.
-        
-        Args:
-            text_body: Plain text content of email
-            
-        Returns:
-            List of item descriptions
-        """
         items = []
         
         # Split into lines
@@ -248,15 +205,6 @@ class ReceiptExtractor:
         return list(dict.fromkeys(items))
     
     def _is_just_numbers(self, text: str) -> bool:
-        """
-        Check if text is just numbers, dates, or prices.
-        
-        Args:
-            text: Text to check
-            
-        Returns:
-            True if text is just numeric/date/price data
-        """
         # Remove common numeric patterns
         cleaned = re.sub(r'[\d.,\s€$£¥zł\-:/]+', '', text)
         # If very little remains, it's probably just numbers

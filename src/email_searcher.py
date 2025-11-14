@@ -8,29 +8,12 @@ from const import ME_ID
 
 
 class EmailSearcher:
-    """Searches for emails matching specific date and amount criteria"""
     
     def __init__(self, gmail_service, amount_tolerance: Decimal = Decimal('0.01')):
-        """
-        Initialize email searcher.
-        
-        Args:
-            gmail_service: Gmail API service instance
-            amount_tolerance: Tolerance for amount matching (default 0.01)
-        """
         self.service = gmail_service
         self.amount_tolerance = amount_tolerance
     
     def _get_message_content(self, message_id: str) -> Optional[Dict[str, Any]]:
-        """
-        Retrieve full message content.
-        
-        Args:
-            message_id: Gmail message ID
-            
-        Returns:
-            Message dictionary or None if error
-        """
         try:
             msg = self.service.users().messages().get(
                 userId=ME_ID,
@@ -43,16 +26,6 @@ class EmailSearcher:
             return None
     
     def _matches_amount(self, message: Dict[str, Any], target_amount: Decimal) -> bool:
-        """
-        Check if message contains the target amount.
-        
-        Args:
-            message: Gmail message dictionary
-            target_amount: Target amount to match
-            
-        Returns:
-            True if message contains matching amount
-        """
         # Extract body text from message
         body_text = self._extract_body_text(message)
         if not body_text:
@@ -74,15 +47,6 @@ class EmailSearcher:
         return False
     
     def _extract_body_text(self, message: Dict[str, Any]) -> str:
-        """
-        Extract text body from Gmail message.
-        
-        Args:
-            message: Gmail message dictionary
-            
-        Returns:
-            Text content of message body
-        """
         payload = message.get('payload', {})
         
         # Try to get body data directly
@@ -98,15 +62,6 @@ class EmailSearcher:
         return ''
     
     def _extract_from_parts(self, parts: List[Dict[str, Any]]) -> str:
-        """
-        Extract text from message parts recursively.
-        
-        Args:
-            parts: List of message parts
-            
-        Returns:
-            Combined text from all parts
-        """
         from base64 import urlsafe_b64decode
         text = ''
         
@@ -133,21 +88,6 @@ class EmailSearcher:
         target_amount: Decimal,
         days_range: int = 7
     ) -> List[Dict[str, Any]]:
-        """
-        Search for receipt emails within a date range that match amount.
-        
-        This searches for emails that might contain item-level receipt details
-        for a transaction, allowing for a few days difference between transaction
-        and receipt dates.
-        
-        Args:
-            target_date: Transaction date
-            target_amount: Transaction amount
-            days_range: Number of days before/after to search (default 7)
-            
-        Returns:
-            List of matching receipt messages
-        """
         start_date = target_date - timedelta(days=days_range)
         end_date = target_date + timedelta(days=days_range)
         
