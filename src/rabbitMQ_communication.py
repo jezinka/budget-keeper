@@ -19,14 +19,20 @@ class RabbitMQCommunication:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.connection.close()
 
-    def send_expense_to_rabbitmq(self, message):
-        body = json.dumps({
+    def send_expense_to_rabbitmq(self, message, enriched_data=None):
+        body_dict = {
             'title': message.get_title(),
             'payee': message.get_who(),
             'amount': message.get_amount(False),
             'transactionDate': message.get_date().strftime('%Y-%m-%d %H:%M:%S'),
             'sendDate': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        })
+        }
+        
+        # Add items if available
+        if enriched_data and 'items' in enriched_data:
+            body_dict['items'] = enriched_data['items']
+        
+        body = json.dumps(body_dict)
         self.channel.basic_publish(exchange='', routing_key='expense', body=body)
 
     def send_log_to_rabbitmq(self, level, message):
