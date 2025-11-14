@@ -1,3 +1,16 @@
+"""
+Main application for processing bank transaction emails from Gmail.
+
+This module fetches emails with a specific label, parses transaction details,
+enriches them with receipt information, and publishes to RabbitMQ.
+
+Features:
+- Fetches bank transaction emails from Gmail
+- Enriches transactions with detailed receipt information
+- Searches for matching receipts based on date and amount
+- Extracts item-level details from receipts
+- Publishes enriched expense data to RabbitMQ
+"""
 import logging
 import time
 from decimal import Decimal
