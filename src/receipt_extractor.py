@@ -1,7 +1,3 @@
-"""
-Module for extracting item-level details from receipt emails.
-Specialized for Allegro emails with JSON-LD structured data.
-"""
 import json
 import logging
 import re
@@ -266,22 +262,4 @@ class ReceiptExtractor:
         # If very little remains, it's probably just numbers
         return len(cleaned) < 5
     
-    def extract_all_details(self, messages: List[Dict[str, Any]]) -> Dict[str, List[str]]:
-        """
-        Extract item details from multiple messages.
-        
-        Args:
-            messages: List of Gmail message dictionaries
-            
-        Returns:
-            Dictionary mapping message IDs to lists of item descriptions
-        """
-        results = {}
-        
-        for message in messages:
-            msg_id = message.get('id', 'unknown')
-            items = self.extract_items_from_message(message)
-            if items:
-                results[msg_id] = items
-        
-        return results
+

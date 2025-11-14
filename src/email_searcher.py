@@ -1,6 +1,3 @@
-"""
-Module for searching emails by date and amount criteria.
-"""
 import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -23,58 +20,6 @@ class EmailSearcher:
         """
         self.service = gmail_service
         self.amount_tolerance = amount_tolerance
-    
-    def search_by_date_and_amount(
-        self, 
-        target_date: datetime, 
-        target_amount: Decimal,
-        label_id: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
-        """
-        Search for emails matching a specific date and amount.
-        
-        Args:
-            target_date: The date to search for
-            target_amount: The amount to search for
-            label_id: Optional Gmail label ID to filter by
-            
-        Returns:
-            List of matching message dictionaries with 'id' and enriched data
-        """
-        # Format date for Gmail search (YYYY/MM/DD)
-        date_str = target_date.strftime('%Y/%m/%d')
-        
-        # Build Gmail search query
-        # Search for messages on the target date
-        query_parts = [f'after:{date_str}', f'before:{date_str}']
-        
-        if label_id:
-            query_parts.append(f'label:{label_id}')
-        
-        query = ' '.join(query_parts)
-        
-        try:
-            # Search for messages
-            result = self.service.users().messages().list(
-                userId=ME_ID,
-                q=query
-            ).execute()
-            
-            messages = result.get('messages', [])
-            
-            # Filter messages by amount
-            matching_messages = []
-            for msg_ref in messages:
-                msg = self._get_message_content(msg_ref['id'])
-                if msg and self._matches_amount(msg, target_amount):
-                    matching_messages.append(msg)
-            
-            logging.info(f'Found {len(matching_messages)} messages matching date {date_str} and amount {target_amount}')
-            return matching_messages
-            
-        except Exception as e:
-            logging.error(f'Error searching emails: {e}')
-            return []
     
     def _get_message_content(self, message_id: str) -> Optional[Dict[str, Any]]:
         """

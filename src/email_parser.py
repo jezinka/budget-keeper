@@ -1,7 +1,3 @@
-"""
-Module for extracting amounts and dates from email content.
-Handles Polish currency formatting (e.g., "82,87 zł") and date formats (e.g., "11.11.2025").
-"""
 import re
 from decimal import Decimal
 from datetime import datetime

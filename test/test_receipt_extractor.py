@@ -128,36 +128,35 @@ class TestReceiptExtractor(unittest.TestCase):
         # Should extract from HTML (preferred)
         self.assertTrue(len(items) > 0)
     
-    def test_extract_all_details(self):
-        """Test extracting from multiple messages at once"""
+    def test_extract_from_multiple_messages(self):
+        """Test extracting from multiple messages"""
         html1 = "<html><body><p>Produkt pierwszy z długą nazwą opisową</p></body></html>"
         html2 = "<html><body><p>Produkt drugi z inną długą nazwą</p></body></html>"
         
-        messages = [
-            {
-                'id': 'msg1',
-                'payload': {
-                    'mimeType': 'text/html',
-                    'body': {
-                        'data': urlsafe_b64encode(html1.encode('utf-8')).decode('utf-8')
-                    }
-                }
-            },
-            {
-                'id': 'msg2',
-                'payload': {
-                    'mimeType': 'text/html',
-                    'body': {
-                        'data': urlsafe_b64encode(html2.encode('utf-8')).decode('utf-8')
-                    }
+        message1 = {
+            'id': 'msg1',
+            'payload': {
+                'mimeType': 'text/html',
+                'body': {
+                    'data': urlsafe_b64encode(html1.encode('utf-8')).decode('utf-8')
                 }
             }
-        ]
+        }
+        message2 = {
+            'id': 'msg2',
+            'payload': {
+                'mimeType': 'text/html',
+                'body': {
+                    'data': urlsafe_b64encode(html2.encode('utf-8')).decode('utf-8')
+                }
+            }
+        }
         
-        results = self.extractor.extract_all_details(messages)
-        self.assertEqual(len(results), 2)
-        self.assertIn('msg1', results)
-        self.assertIn('msg2', results)
+        items1 = self.extractor.extract_items_from_message(message1)
+        items2 = self.extractor.extract_items_from_message(message2)
+        
+        self.assertTrue(len(items1) > 0)
+        self.assertTrue(len(items2) > 0)
 
 
 if __name__ == '__main__':

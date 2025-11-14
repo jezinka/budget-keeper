@@ -1,16 +1,3 @@
-"""
-Main application for processing bank transaction emails from Gmail.
-
-This module fetches emails with a specific label, parses transaction details,
-enriches them with receipt information, and publishes to RabbitMQ.
-
-Features:
-- Fetches bank transaction emails from Gmail
-- Enriches transactions with detailed receipt information
-- Searches for matching receipts based on date and amount
-- Extracts item-level details from receipts
-- Publishes enriched expense data to RabbitMQ
-"""
 import logging
 import time
 from decimal import Decimal
@@ -27,17 +14,6 @@ from receipt_extractor import ReceiptExtractor
 MAX_RETRIES = 3
 
 def enrich_message_with_receipts(gmail_service, msg, message):
-    """
-    Enrich message with receipt details by searching for matching emails.
-    
-    Args:
-        gmail_service: Gmail API service
-        msg: Original message reference
-        message: Parsed Message object
-        
-    Returns:
-        Dictionary with enriched data or None if no receipts found
-    """
     try:
         # Get full message content for parsing
         full_msg = gmail_service.users().messages().get(
@@ -78,7 +54,6 @@ def enrich_message_with_receipts(gmail_service, msg, message):
         # Extract item details from receipt messages
         extractor = ReceiptExtractor()
         all_items = []
-        receipt_ids = []
         
         for receipt_msg in receipt_messages:
             receipt_id = receipt_msg.get('id', '')
@@ -89,14 +64,10 @@ def enrich_message_with_receipts(gmail_service, msg, message):
             items = extractor.extract_items_from_message(receipt_msg)
             if items:
                 all_items.extend(items)
-                receipt_ids.append(receipt_id)
                 logging.info(f'Extracted {len(items)} items from receipt {receipt_id}')
         
         if all_items:
-            return {
-                'items': all_items,
-                'receipt_ids': receipt_ids
-            }
+            return {'items': all_items}
         
         return None
         
