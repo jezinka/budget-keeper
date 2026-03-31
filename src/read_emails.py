@@ -1,3 +1,5 @@
+import html
+import json
 import logging
 import re
 from base64 import urlsafe_b64decode
@@ -60,3 +62,62 @@ def prepare_body(payload):
     body = urlsafe_b64decode(payload.get("body")['data']).decode("utf-8", "replace")
     text = BeautifulSoup(body, 'html.parser').table.table.get_text().strip()
     return re.sub(r'\s{2}', '', text)
+
+
+def read_purchase_info_message(service, mail):
+    msg = service.users().messages().get(userId=ME_ID, id=mail[ID], format='full').execute()
+    html_body = extract_html_body(msg['payload'])
+    jsonld_items = extract_jsonld_from_html(html_body)
+    return parse_purchase_info(jsonld_items)
+
+
+def extract_html_body(payload):
+    if payload.get('mimeType') == 'text/html':
+        data = payload.get('body', {}).get('data', '')
+        if data:
+            return urlsafe_b64decode(data).decode('utf-8', 'replace')
+    for part in payload.get('parts', []):
+        result = extract_html_body(part)
+        if result:
+            return result
+    return ''
+
+
+def parse_purchase_info(jsonld_items):
+    flat_items = []
+    for item in jsonld_items:
+        if isinstance(item, list):
+            flat_items.extend(item)
+        else:
+            flat_items.append(item)
+
+    order = next((item for item in flat_items if isinstance(item, dict) and item.get('@type') == 'Order'), None)
+    if order is None:
+        raise ValueError("No Order found in ld+json")
+
+    price = order.get('price')
+    order_date = order.get('orderDate')
+    accepted_offers = order.get('acceptedOffer', [])
+    names = [offer.get('itemOffered', {}).get('name', '') for offer in accepted_offers if isinstance(offer, dict)]
+
+    return {
+        'price': price,
+        'name': ', '.join(filter(None, names)),
+        'orderDate': order_date
+    }
+
+
+def extract_jsonld_from_html(html_text):
+    soup = BeautifulSoup(html_text, "html.parser")
+    results = []
+    for script in soup.find_all("script", {"type": "application/ld+json"}):
+        content = script.string if script.string is not None else script.get_text()
+        if not content:
+            continue
+        content = html.unescape(content).strip()
+        try:
+            parsed = json.loads(content)
+            results.append(parsed)
+        except json.JSONDecodeError as e:
+            results.append({"_raw": content, "_error": str(e)})
+    return results

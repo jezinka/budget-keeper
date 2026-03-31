@@ -29,6 +29,15 @@ class RabbitMQCommunication:
         })
         self.channel.basic_publish(exchange='', routing_key='expense', body=body)
 
+    def send_purchase_info_to_rabbitmq(self, purchase_info):
+        body = json.dumps({
+            'price': purchase_info['price'],
+            'name': purchase_info['name'],
+            'orderDate': purchase_info['orderDate'],
+            'sendDate': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
+        self.channel.basic_publish(exchange='', routing_key='purchase_info', body=body)
+
     def send_log_to_rabbitmq(self, level, message):
         body = json.dumps({
             'level': level,

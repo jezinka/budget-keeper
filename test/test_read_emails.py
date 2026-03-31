@@ -1,6 +1,6 @@
 import unittest
 
-from src.read_emails import prepare_message_dict
+from src.read_emails import prepare_message_dict, parse_purchase_info
 
 
 class TestReadMails(unittest.TestCase):
@@ -15,9 +15,9 @@ class TestReadMails(unittest.TestCase):
                              {'kwota': '19,22', 'kiedy': '05-01-2023', 'tytul': 'JMP S.A. BIEDRONKA 1244 WROCLAW'})
 
     def test_prepare_message_dict_income(self):
-        body = 'Na Twoje konto wpłynęło 9 999,98 PLN od PAULINA KACZMAREK.Szczegóły przelewu:Tytuł:Przelew własnyNadawca:PAULINA KACZMAREKKwota:9 999,98 PLNNa konto:11 2222 3333 4444 5555 6666 7777 Stan konta po przelewie:Saldo:9 999,99 PLN Tel'
+        body = 'Na Twoje konto wpłynęło 9 999,98 PLN od PAULINA P.Szczegóły przelewu:Tytuł:Przelew własnyNadawca:PAULINA PKwota:9 999,98 PLNNa konto:11 2222 3333 4444 5555 6666 7777 Stan konta po przelewie:Saldo:9 999,99 PLN Tel'
         self.assertDictEqual(prepare_message_dict(body, True),
-                             {'tytul': 'Przelew własny', 'kto': 'PAULINA KACZMAREK', 'kwota': '9 999,98'})
+                             {'tytul': 'Przelew własny', 'kto': 'PAULINA P', 'kwota': '9 999,98'})
 
     def test_prepare_message_dict_atm_income(self):
         body = "Wpłata we wpłatomacie 100,00 PLN. Na Twoje konto wpłynęło 100,00 PLN.Szczegóły:Ile:100,00 PLN Kiedy:17-10-2022 Karta:Dopasowana Visa 1234 Gdzie:ATMTel"
@@ -36,6 +36,49 @@ class TestReadMails(unittest.TestCase):
         body = 'Stan Twojego konta zmniejszył się o -50,00 PLN. Szczegóły:Ile:-0,01 PLN Kiedy:19-09-2022 Karta:Dopasowana Visa 1234 Gdzie:ATMTel'
         self.assertDictEqual(prepare_message_dict(body, False),
                              {'kwota': '0,01', 'kiedy': '19-09-2022', 'tytul': 'ATM'})
+
+
+class TestParsePurchaseInfo(unittest.TestCase):
+    SAMPLE_JSONLD = [[{
+        '@context': 'http://schema.org',
+        '@type': 'Order',
+        'price': '82.87',
+        'priceCurrency': 'PLN',
+        'acceptedOffer': [
+            {
+                '@type': 'Offer',
+                'itemOffered': {
+                    '@type': 'Product',
+                    'name': 'Prześcieradło z gumką 220x200 gruba satyna, bawełna 100% granat niebieski'
+                },
+                'price': '82.87'
+            }
+        ],
+        'orderDate': '11.11.2025, 20:00'
+    }]]
+
+    def test_parse_purchase_info_single_item(self):
+        result = parse_purchase_info(self.SAMPLE_JSONLD)
+        self.assertEqual(result['price'], '82.87')
+        self.assertEqual(result['name'], 'Prześcieradło z gumką 220x200 gruba satyna, bawełna 100% granat niebieski')
+        self.assertEqual(result['orderDate'], '11.11.2025, 20:00')
+
+    def test_parse_purchase_info_multiple_items(self):
+        jsonld = [[{
+            '@type': 'Order',
+            'price': '50.00',
+            'acceptedOffer': [
+                {'itemOffered': {'name': 'Produkt A'}},
+                {'itemOffered': {'name': 'Produkt B'}},
+            ],
+            'orderDate': '01.01.2025, 10:00'
+        }]]
+        result = parse_purchase_info(jsonld)
+        self.assertEqual(result['name'], 'Produkt A, Produkt B')
+
+    def test_parse_purchase_info_no_order_raises(self):
+        with self.assertRaises(ValueError):
+            parse_purchase_info([[{'@type': 'Person', 'name': 'Jan'}]])
 
 
 if __name__ == '__main__':
