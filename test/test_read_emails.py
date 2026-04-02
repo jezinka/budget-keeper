@@ -67,7 +67,7 @@ class TestParsePurchaseInfo(unittest.TestCase):
         """When BLIK payment (after discount) differs from order total, BLIK amount is used."""
         html_body = '<html><body>Gravitrax 228,99 zł ... Płatność 128,99 zł przekazana Metoda płatności BLIK</body></html>'
         result = parse_purchase_info(self.SAMPLE_JSONLD, html_body)
-        self.assertEqual(result['price'], '128,99')
+        self.assertEqual(result['price'], '128.99')
 
     def test_parse_purchase_info_fallback_to_jsonld_price(self):
         """When no BLIK payment text found, falls back to ld+json price."""

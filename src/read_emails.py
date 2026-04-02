@@ -115,7 +115,7 @@ def _extract_blik_payment(html_body):
     text = soup.get_text(separator=' ')
     match = re.search(r'Płatność\s+([\d\s]+,\d{2})\s*zł', text)
     if match:
-        return match.group(1).replace(' ', '')
+        return match.group(1).replace(' ', '').replace(',', '.')
     return None
 
 
