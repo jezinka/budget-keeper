@@ -23,6 +23,16 @@
       "read": ".*"
     }
   ],
+  "exchanges": [
+    {
+      "name": "purchase_info.dlx",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
   "queues": [
     {
       "name": "expense",
@@ -41,6 +51,35 @@
       "arguments": {
         "x-queue-type": "classic"
       }
+    },
+    {
+      "name": "purchase_info",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic",
+        "x-dead-letter-exchange": "purchase_info.dlx"
+      }
+    },
+    {
+      "name": "purchase_info.dlq",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "purchase_info.dlx",
+      "vhost": "/",
+      "destination": "purchase_info.dlq",
+      "destination_type": "queue",
+      "routing_key": "purchase_info",
+      "arguments": {}
     }
   ]
 }

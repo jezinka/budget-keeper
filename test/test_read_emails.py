@@ -63,6 +63,17 @@ class TestParsePurchaseInfo(unittest.TestCase):
         self.assertEqual(result['name'], 'Prześcieradło z gumką 220x200 gruba satyna, bawełna 100% granat niebieski')
         self.assertEqual(result['orderDate'], '11.11.2025, 20:00')
 
+    def test_parse_purchase_info_blik_overrides_order_price(self):
+        """When BLIK payment (after discount) differs from order total, BLIK amount is used."""
+        html_body = '<html><body>Gravitrax 228,99 zł ... Płatność 128,99 zł przekazana Metoda płatności BLIK</body></html>'
+        result = parse_purchase_info(self.SAMPLE_JSONLD, html_body)
+        self.assertEqual(result['price'], '128,99')
+
+    def test_parse_purchase_info_fallback_to_jsonld_price(self):
+        """When no BLIK payment text found, falls back to ld+json price."""
+        result = parse_purchase_info(self.SAMPLE_JSONLD, '<html><body>no payment text</body></html>')
+        self.assertEqual(result['price'], '82.87')
+
     def test_parse_purchase_info_multiple_items(self):
         jsonld = [[{
             '@type': 'Order',

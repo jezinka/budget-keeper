@@ -68,7 +68,7 @@ def read_purchase_info_message(service, mail):
     msg = service.users().messages().get(userId=ME_ID, id=mail[ID], format='full').execute()
     html_body = extract_html_body(msg['payload'])
     jsonld_items = extract_jsonld_from_html(html_body)
-    return parse_purchase_info(jsonld_items)
+    return parse_purchase_info(jsonld_items, html_body)
 
 
 def extract_html_body(payload):
@@ -83,7 +83,7 @@ def extract_html_body(payload):
     return ''
 
 
-def parse_purchase_info(jsonld_items):
+def parse_purchase_info(jsonld_items, html_body=''):
     flat_items = []
     for item in jsonld_items:
         if isinstance(item, list):
@@ -95,16 +95,28 @@ def parse_purchase_info(jsonld_items):
     if order is None:
         raise ValueError("No Order found in ld+json")
 
-    price = order.get('price')
     order_date = order.get('orderDate')
     accepted_offers = order.get('acceptedOffer', [])
     names = [offer.get('itemOffered', {}).get('name', '') for offer in accepted_offers if isinstance(offer, dict)]
+
+    price = _extract_blik_payment(html_body) or order.get('price')
 
     return {
         'price': price,
         'name': ', '.join(filter(None, names)),
         'orderDate': order_date
     }
+
+
+def _extract_blik_payment(html_body):
+    """Extract actual BLIK payment amount from email HTML body.
+    Handles cases where points/vouchers reduce the amount paid vs. the order total."""
+    soup = BeautifulSoup(html_body, 'html.parser')
+    text = soup.get_text(separator=' ')
+    match = re.search(r'Płatność\s+([\d\s]+,\d{2})\s*zł', text)
+    if match:
+        return match.group(1).replace(' ', '')
+    return None
 
 
 def extract_jsonld_from_html(html_text):
