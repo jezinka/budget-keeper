@@ -3,10 +3,11 @@ import json
 import logging
 import re
 from base64 import urlsafe_b64decode
+from datetime import datetime
 
 from bs4 import BeautifulSoup
 
-from const import ME_ID, ID, AMOUNT_KEY, CURRENCY_KEY, TITLE_KEY, WHO_KEY, WHEN_KEY, INCOME_KEY
+from const import ME_ID, ID, AMOUNT_KEY, CURRENCY_KEY, TITLE_KEY, WHO_KEY, WHEN_KEY, INCOME_KEY, LONG_F
 from message import Message
 
 
@@ -66,9 +67,12 @@ def prepare_body(payload):
 
 def read_purchase_info_message(service, mail):
     msg = service.users().messages().get(userId=ME_ID, id=mail[ID], format='full').execute()
+    headers = msg['payload'].get('headers', [])
     html_body = extract_html_body(msg['payload'])
     jsonld_items = extract_jsonld_from_html(html_body)
-    return parse_purchase_info(jsonld_items, html_body)
+    if jsonld_items:
+        return parse_purchase_info(jsonld_items, html_body)
+    return parse_donation(headers)
 
 
 def extract_html_body(payload):
@@ -117,6 +121,32 @@ def _extract_blik_payment(html_body):
     if match:
         return match.group(1).replace(' ', '').replace(',', '.')
     return None
+
+
+def parse_donation(headers):
+    """Parse donation confirmation email
+    Extracts amount and organization from subject, date from email header."""
+
+    def get_header(name):
+        return next((h['value'] for h in headers if h['name'].lower() == name.lower()), '')
+
+    subject = get_header('subject')
+    date_str = get_header('date')
+
+    amount_match = re.search(r'darowizna\s+([\d]+(?:[,.]\d+)?)\s*zł', subject)
+    if not amount_match:
+        raise ValueError(f"Could not parse donation amount from subject: {subject}")
+    price = amount_match.group(1).replace(',', '.')
+
+    org_match = re.search(r'została przekazana\s*[-–]\s*(.+)$', subject)
+    if not org_match:
+        raise ValueError(f"Could not parse organization from subject: {subject}")
+    name = org_match.group(1).strip()
+
+    date = datetime.strptime(date_str, LONG_F)
+    order_date = date.strftime('%-d.%m.%Y, %H:%M')
+
+    return {'price': price, 'name': name, 'orderDate': order_date}
 
 
 def extract_jsonld_from_html(html_text):

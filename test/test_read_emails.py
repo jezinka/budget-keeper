@@ -1,6 +1,6 @@
 import unittest
 
-from src.read_emails import prepare_message_dict, parse_purchase_info
+from src.read_emails import prepare_message_dict, parse_purchase_info, parse_donation
 
 
 class TestReadMails(unittest.TestCase):
@@ -90,6 +90,44 @@ class TestParsePurchaseInfo(unittest.TestCase):
     def test_parse_purchase_info_no_order_raises(self):
         with self.assertRaises(ValueError):
             parse_purchase_info([[{'@type': 'Person', 'name': 'Jan'}]])
+
+
+class TestParseSiepomaga(unittest.TestCase):
+    HEADERS_FDDS = [
+        {'name': 'Subject',
+         'value': 'Twoja comiesięczna darowizna 100 zł została przekazana - Fundacja Dajemy Dzieciom Siłę'},
+        {'name': 'Date', 'value': 'Thu, 26 Mar 2026 07:00:46 +0100'},
+    ]
+
+    HEADERS_WOSP = [
+        {'name': 'Subject',
+         'value': 'Twoja comiesięczna darowizna 100 zł została przekazana - Wielka Orkiestra Świątecznej Pomocy'},
+        {'name': 'Date', 'value': 'Thu, 26 Mar 2026 07:00:45 +0100'},
+    ]
+
+    def test_parse_fdds_amount(self):
+        result = parse_donation(self.HEADERS_FDDS)
+        self.assertEqual(result['price'], '100')
+
+    def test_parse_fdds_name(self):
+        result = parse_donation(self.HEADERS_FDDS)
+        self.assertEqual(result['name'], 'Fundacja Dajemy Dzieciom Siłę')
+
+    def test_parse_fdds_date(self):
+        result = parse_donation(self.HEADERS_FDDS)
+        self.assertEqual(result['orderDate'], '26.03.2026, 07:00')
+
+    def test_parse_wosp_name(self):
+        result = parse_donation(self.HEADERS_WOSP)
+        self.assertEqual(result['name'], 'Wielka Orkiestra Świątecznej Pomocy')
+
+    def test_no_amount_raises(self):
+        headers = [
+            {'name': 'Subject', 'value': 'Inny email bez kwoty'},
+            {'name': 'Date', 'value': 'Thu, 26 Mar 2026 07:00:46 +0100'},
+        ]
+        with self.assertRaises(ValueError):
+            parse_donation(headers)
 
 
 if __name__ == '__main__':
