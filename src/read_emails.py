@@ -34,23 +34,45 @@ def process_message(payload):
 
 
 def prepare_message_dict(body, income):
-    patterns = [
-        rf"Ile:[\+\-]?(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}}) Kiedy:(?P<{WHEN_KEY}>\d{{2}}-\d{{2}}-\d{{4}})([\w ].*)Gdzie:(?P<{TITLE_KEY}>[\w\"].*)Tel",
-        rf"Tytuł:(?P<{TITLE_KEY}>.+?)Nadawca:(?P<{WHO_KEY}>\w.*)Kwota:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}})",
-        rf"(Odbiorca:(?P<{WHO_KEY}>.*))? Ile:(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}}) (?P<{CURRENCY_KEY}>\w{{3}}) Tytuł:(?P<{TITLE_KEY}>.*) Kiedy:(?P<{WHEN_KEY}>\d{{2}}-\d{{2}}-\d{{4}})"
-    ]
-    m = None
-    for pattern in patterns:
-        m = re.search(pattern, body)
-        if m:
-            break
+    def extract_required(pattern, field_name):
+        match = re.search(pattern, body, re.IGNORECASE)
+        if not match:
+            raise ValueError(f"Could not parse {field_name} from email body")
+        return match.group(field_name)
 
-    if m is None:
-        raise ValueError("No match found in the email body")
+    amount = extract_required(
+        rf"(?:Ile|Kwota):\s*[\+\-]?(?P<{AMOUNT_KEY}>[\d ]*,\d{{2}})",
+        AMOUNT_KEY,
+    )
+    currency = extract_required(
+        rf"(?:Ile|Kwota):\s*[\+\-]?[\d ]*,\d{{2}}\s*(?P<{CURRENCY_KEY}>[A-Z]{{3}})",
+        CURRENCY_KEY,
+    )
 
-    m_groupdict = m.groupdict()
-    m_groupdict[INCOME_KEY] = income
-    return m_groupdict
+    when_match = re.search(rf"Kiedy:\s*(?P<{WHEN_KEY}>\d{{2}}-\d{{2}}-\d{{4}})", body)
+    title_match = re.search(
+        rf"(?:Tytuł|Gdzie):\s*(?P<{TITLE_KEY}>.*?)(?=\s*(?:Nadawca:|Odbiorca:|Od kogo:|Do kogo:|Kwota:|Ile:|Kiedy:|Data księgowania:|Na konto:|Saldo:|Tel|$))",
+        body,
+    )
+    who_match = re.search(
+        rf"(?:Nadawca|Odbiorca|Od kogo|Do kogo):\s*(?P<{WHO_KEY}>.*?)(?=\s*(?:Kwota:|Ile:|Tytuł:|Kiedy:|Data księgowania:|Na konto:|Saldo:|Tel|$))",
+        body,
+    )
+
+    if not title_match:
+        raise ValueError("Could not parse title from email body")
+
+    message_dict = {
+        AMOUNT_KEY: amount,
+        CURRENCY_KEY: currency,
+        TITLE_KEY: title_match.group(TITLE_KEY).strip(),
+        WHO_KEY: who_match.group(WHO_KEY).strip() if who_match else None,
+        INCOME_KEY: income,
+    }
+    if when_match:
+        message_dict[WHEN_KEY] = when_match.group(WHEN_KEY)
+
+    return message_dict
 
 
 def is_income(body, headers):
