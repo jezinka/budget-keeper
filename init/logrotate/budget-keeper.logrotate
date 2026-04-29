@@ -1,0 +1,19 @@
+# Logrotate config for budget-keeper Docker containers.
+# Install on host:
+#   sudo cp init/logrotate/budget-keeper.logrotate /etc/logrotate.d/budget-keeper
+# Then test with:
+#   sudo logrotate -d /etc/logrotate.d/budget-keeper
+
+/var/lib/docker/containers/*/*-json.log {
+    daily
+    rotate 7
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+    create 0640 root root
+    dateext
+    dateformat -%Y%m%d
+}
+
